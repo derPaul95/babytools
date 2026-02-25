@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BabyTools - BabyWetter</title>
+    <meta
+      name="description"
+      content="BabyWetter hilft mit einer einfachen Outfit-Empfehlung für Babys basierend auf Wetter und Alter."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <p class="eyebrow">BabyTools</p>
+        <h1>BabyWetter - Was soll mein Baby heute anziehen?</h1>
+        <p class="lead">
+          Nutze deinen Standort oder suche einen Ort und erhalte eine klare
+          Zwiebellook-Empfehlung.
+        </p>
+      </header>
+
+      <section class="card" aria-labelledby="input-heading">
+        <h2 id="input-heading">Wetter und Alter</h2>
+
+        <div class="row">
+          <button id="geoBtn" type="button">Standort verwenden</button>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="search-wrap">
+          <label class="search-label" for="locationQuery">Standort suchen</label>
+          <div class="search-controls">
+            <input
+              id="locationQuery"
+              type="text"
+              placeholder="z. B. Berlin, Hamburg, Muenchen"
+              autocomplete="off"
+            />
+            <button id="searchBtn" type="button">Ort suchen</button>
+          </div>
+          <div id="resultsLabel" class="hidden">
+            <p class="results-title">Treffer</p>
+            <div id="locationResults" class="result-buttons" role="listbox"></div>
+          </div>
+        </div>
+
+        <form id="weatherForm" novalidate>
+          <div class="weather-view" aria-live="polite">
+            <div class="weather-card">
+              <p class="weather-symbol" aria-hidden="true">🌡️</p>
+              <p class="weather-label">Temperatur</p>
+              <p id="tempValue" class="weather-value">--.- °C</p>
+            </div>
+            <div class="weather-card">
+              <p class="weather-symbol" aria-hidden="true">💨</p>
+              <p class="weather-label">Wind</p>
+              <p id="windValue" class="weather-value">--.- km/h</p>
+            </div>
+            <div class="weather-card">
+              <p class="weather-symbol" aria-hidden="true">🌧️</p>
+              <p class="weather-label">Regen</p>
+              <p id="rainValue" class="weather-value">--.- mm/h</p>
+            </div>
+            <div class="weather-card">
+              <p id="conditionSymbol" class="weather-symbol" aria-hidden="true">☁️</p>
+              <p class="weather-label">Bedingung</p>
+              <p id="conditionValue" class="weather-value">Unbekannt</p>
+            </div>
+          </div>
+
+          <div class="grid">
+
+            <div class="choice-block">
+              <p class="choice-title">Alter</p>
+              <div class="choice-group" role="radiogroup" aria-label="Alter">
+                <button type="button" class="choice-btn" data-target="age" data-value="newborn" aria-pressed="false">Neugeboren (0-3)</button>
+                <button type="button" class="choice-btn is-active" data-target="age" data-value="baby" aria-pressed="true">Baby (4-12)</button>
+                <button type="button" class="choice-btn" data-target="age" data-value="toddler" aria-pressed="false">Kleinkind (1-3)</button>
+              </div>
+              <input id="age" type="hidden" value="baby" />
+            </div>
+
+            <div class="choice-block">
+              <p class="choice-title">Situation</p>
+              <div class="choice-group" role="radiogroup" aria-label="Situation">
+                <button type="button" class="choice-btn" data-target="situation" data-value="stroller" aria-pressed="false">Kinderwagen</button>
+                <button type="button" class="choice-btn is-active" data-target="situation" data-value="active" aria-pressed="true">Normal draussen</button>
+                <button type="button" class="choice-btn" data-target="situation" data-value="carrier" aria-pressed="false">Trage</button>
+              </div>
+              <input id="situation" type="hidden" value="active" />
+            </div>
+          </div>
+
+          <button id="recommendBtn" class="primary" type="submit" disabled>
+            Empfehlung anzeigen
+          </button>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="result-heading">
+        <h2 id="result-heading">Empfehlung</h2>
+
+        <div id="emptyState" class="empty">Noch keine Empfehlung berechnet.</div>
+
+        <div id="result" class="hidden">
+          <div class="metric-cards">
+            <article class="metric-card">
+              <p class="metric-icon" aria-hidden="true">🌡️</p>
+              <p class="metric-label">Temperatur</p>
+              <p class="metric-value"><span id="outTemp"></span> °C</p>
+            </article>
+            <article class="metric-card">
+              <p class="metric-icon" aria-hidden="true">🍃</p>
+              <p class="metric-label">Gefuehlt</p>
+              <p class="metric-value"><span id="outFeels"></span> °C</p>
+            </article>
+            <article class="metric-card">
+              <p id="riskIcon" class="metric-icon" aria-hidden="true">✅</p>
+              <p class="metric-label">Risiko</p>
+              <p class="metric-value"><span id="riskBadge" class="badge"></span></p>
+            </article>
+          </div>
+
+          <p id="topRecommendation" class="top-reco"></p>
+
+          <h3>Draußen (unterwegs)</h3>
+          <ol id="outfitList" class="layer-list"></ol>
+
+          <h3>Hinweise</h3>
+          <div id="tipsList" class="tips-chips"></div>
+        </div>
+      </section>
+
+      <footer class="disclaimer">
+        Hinweis: Diese Empfehlungen ersetzen keine medizinische Beratung. Im Zweifel
+        bitte Kinderarzt oder Hebamme kontaktieren.
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
