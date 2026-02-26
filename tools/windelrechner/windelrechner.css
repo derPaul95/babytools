@@ -41,24 +41,6 @@
   gap: 0.9rem;
 }
 
-.windelrechner-page .form-columns {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.9rem;
-}
-
-.windelrechner-page .form-col {
-  border: 1px solid #efe5db;
-  border-radius: 14px;
-  background: #fffdfa;
-  padding: 0.8rem;
-}
-
-.windelrechner-page .col-title {
-  margin: 0 0 0.65rem;
-  font-size: 1rem;
-}
-
 .windelrechner-page .choice-title {
   margin: 0;
   font-weight: 600;
@@ -184,11 +166,6 @@
 @media (min-width: 720px) {
   .windelrechner-page .page {
     padding: 1.4rem;
-  }
-
-  .windelrechner-page .form-columns {
-    grid-template-columns: 1.45fr 1fr;
-    align-items: start;
   }
 
   .windelrechner-page .form-actions {
