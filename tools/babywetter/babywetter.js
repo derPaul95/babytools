@@ -5,25 +5,25 @@ const GEO_REVERSE_API_BASE = "https://geocoding-api.open-meteo.com/v1/reverse";
 const FALLBACK_PLACES = [
   { name: "Berlin", country: "Deutschland", latitude: 52.52, longitude: 13.405 },
   { name: "Hamburg", country: "Deutschland", latitude: 53.5511, longitude: 9.9937 },
-  { name: "Muenchen", country: "Deutschland", latitude: 48.1371, longitude: 11.5754 },
-  { name: "Koeln", country: "Deutschland", latitude: 50.9375, longitude: 6.9603 },
+  { name: "München", country: "Deutschland", latitude: 48.1371, longitude: 11.5754 },
+  { name: "Köln", country: "Deutschland", latitude: 50.9375, longitude: 6.9603 },
   { name: "Frankfurt am Main", country: "Deutschland", latitude: 50.1109, longitude: 8.6821 },
   { name: "Offenbach am Main", country: "Deutschland", latitude: 50.0956, longitude: 8.7761 },
   { name: "Hanau", country: "Deutschland", latitude: 50.1264, longitude: 8.9283 },
   { name: "Stuttgart", country: "Deutschland", latitude: 48.7758, longitude: 9.1829 },
-  { name: "Duesseldorf", country: "Deutschland", latitude: 51.2277, longitude: 6.7735 },
+  { name: "Düsseldorf", country: "Deutschland", latitude: 51.2277, longitude: 6.7735 },
   { name: "Dortmund", country: "Deutschland", latitude: 51.5136, longitude: 7.4653 },
   { name: "Essen", country: "Deutschland", latitude: 51.4556, longitude: 7.0116 },
   { name: "Leipzig", country: "Deutschland", latitude: 51.3397, longitude: 12.3731 },
   { name: "Bremen", country: "Deutschland", latitude: 53.0793, longitude: 8.8017 },
   { name: "Dresden", country: "Deutschland", latitude: 51.0504, longitude: 13.7373 },
   { name: "Hannover", country: "Deutschland", latitude: 52.3759, longitude: 9.732 },
-  { name: "Nuernberg", country: "Deutschland", latitude: 49.4521, longitude: 11.0767 },
+  { name: "Nürnberg", country: "Deutschland", latitude: 49.4521, longitude: 11.0767 },
   { name: "Mannheim", country: "Deutschland", latitude: 49.4875, longitude: 8.466 },
   { name: "Freiburg im Breisgau", country: "Deutschland", latitude: 47.999, longitude: 7.8421 },
-  { name: "Saarbruecken", country: "Deutschland", latitude: 49.2402, longitude: 6.9969 },
+  { name: "Saarbrücken", country: "Deutschland", latitude: 49.2402, longitude: 6.9969 },
   { name: "Wien", country: "Oesterreich", latitude: 48.2082, longitude: 16.3738 },
-  { name: "Zuerich", country: "Schweiz", latitude: 47.3769, longitude: 8.5417 },
+  { name: "Zürich", country: "Schweiz", latitude: 47.3769, longitude: 8.5417 },
 ];
 
 const el = {
@@ -123,7 +123,7 @@ function describeWeatherCode(code) {
   const c = Number(code);
 
   if (c === 0) return { label: "Sonnig/Klar", symbol: "☀️", type: "sunny" };
-  if (c === 1 || c === 2) return { label: "Leicht bewoelkt", symbol: "⛅", type: "cloudy" };
+  if (c === 1 || c === 2) return { label: "Leicht bewölkt", symbol: "⛅", type: "cloudy" };
   if (c === 3) return { label: "Bedeckt", symbol: "☁️", type: "cloudy" };
   if (c === 45 || c === 48) return { label: "Nebel", symbol: "🌫️", type: "fog" };
   if (
@@ -153,7 +153,7 @@ function describeWeatherCode(code) {
   return { label: "Wetter gemischt", symbol: "🌤️", type: "mixed" };
 }
 
-// Sehr einfache Approximation: Wind kuehlt, Regen ebenfalls leicht.
+// Sehr einfache Approximation: Wind kühlt, Regen ebenfalls leicht.
 function calculateFeelsLike(temp, wind, rain) {
   const windPenalty = Math.min(wind * 0.07, 7);
   const rainPenalty = rain > 0 ? Math.min(rain * 0.6, 3) : 0;
@@ -161,7 +161,7 @@ function calculateFeelsLike(temp, wind, rain) {
 }
 
 function determineRisk(feelsLike) {
-  if (feelsLike < 5) return { key: "cold", label: "Kaelte" };
+  if (feelsLike < 5) return { key: "cold", label: "Kälte" };
   if (feelsLike > 27) return { key: "hot", label: "Hitze" };
   return { key: "normal", label: "Normal" };
 }
@@ -191,8 +191,8 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
     return [
       "Langarm-Body (hautnah)",
       "Warmer Midlayer (Wolle/Fleece)",
-      "Sehr warme Aussenschicht (Winteroverall)",
-      "Muetze, Halstuch, Handschuhe, sehr warme Socken",
+      "Sehr warme Außenschicht (Winteroverall)",
+      "Mütze, Halstuch, Handschuhe, sehr warme Socken",
     ];
   }
 
@@ -201,7 +201,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
       "Langarm-Body (hautnah)",
       "Warmer Midlayer (Wolle/Fleece)",
       "Warme Jacke oder Overall",
-      "Muetze und warme Socken",
+      "Mütze und warme Socken",
     ];
   }
 
@@ -210,7 +210,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
       "Langarm-Body",
       "Pullover oder Strickjacke",
       "Winddichte Jacke",
-      "Lange Hose und Muetze",
+      "Lange Hose und Mütze",
     ];
   }
 
@@ -226,7 +226,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
     return [
       "Kurz- oder Langarm-Body (je nach Wind)",
       "Leichte Hose",
-      "Optional duenne Schicht zum schnellen Anpassen",
+      "Optional dünne Schicht zum schnellen Anpassen",
     ];
   }
 
@@ -243,8 +243,8 @@ function getBabyLayerProfile(baseFeelsLike, situation) {
     return [
       "Langarm-Body",
       "Warmer Midlayer (Fleece/Strick)",
-      "Warme Aussenschicht (Jacke/Overall)",
-      "Muetze und warme Socken",
+      "Warme Außenschicht (Jacke/Overall)",
+      "Mütze und warme Socken",
     ];
   }
 
@@ -270,7 +270,7 @@ function getBabyLayerProfile(baseFeelsLike, situation) {
     return [
       "Kurz- oder Langarm-Body",
       "Leichte Hose",
-      "Optional duenne Zusatzschicht fuer Pausen",
+      "Optional dünne Zusatzschicht für Pausen",
     ];
   }
 
@@ -288,7 +288,7 @@ function getToddlerLayerProfile(baseFeelsLike, situation) {
       "Langarm-Shirt oder Body",
       "Warmer Midlayer",
       "Warme Jacke",
-      "Muetze und warme Socken",
+      "Mütze und warme Socken",
     ];
   }
 
@@ -311,8 +311,8 @@ function getToddlerLayerProfile(baseFeelsLike, situation) {
 
   if (toddlerIndex < 24) {
     return [
-      "Duennes Shirt",
-      "Leichte Hose oder duenne Leggings",
+      "Dünnes Shirt",
+      "Leichte Hose oder dünne Leggings",
       "Leichte Jacke nur bei Wind",
     ];
   }
@@ -332,24 +332,24 @@ function getOutfitByAge(age, feelsLike, situation) {
 function getTips(risk, rain, wind, conditionType) {
   const tips = [
     "Nacken- und Brust-Check: warm, aber nicht schwitzig.",
-    "Mehrere duenne Schichten sind besser als eine dicke.",
+    "Mehrere dünne Schichten sind besser als eine dicke.",
     "Ueberhitzung vermeiden, besonders im Kinderwagen mit Decke.",
   ];
 
   if (rain > 0) {
-    tips.push("Regenschutz fuer Kinderwagen/Buggy und trockene Ersatzkleidung einplanen.");
+    tips.push("Regenschutz für Kinderwagen/Buggy und trockene Ersatzkleidung einplanen.");
   }
 
   if (wind >= 20) {
-    tips.push("Bei starkem Wind zusaetzlich winddichte Aussenschicht nutzen.");
+    tips.push("Bei starkem Wind zusätzlich winddichte Außenschicht nutzen.");
   }
 
   if (risk.key === "cold") {
-    tips.push("Bei kaelteren Bedingungen Haende, Fuesse und Kopf besonders gut schuetzen.");
+    tips.push("Bei kälteren Bedingungen Hände, Füße und Kopf besonders gut schützen.");
   }
 
   if (risk.key === "hot") {
-    tips.push("Bei Hitze direkte Sonne meiden und auf regelmaessige Trinkpausen achten.");
+    tips.push("Bei Hitze direkte Sonne meiden und auf regelmäßige Trinkpausen achten.");
   }
 
   if (conditionType === "sunny") {
@@ -357,11 +357,11 @@ function getTips(risk, rain, wind, conditionType) {
   }
 
   if (conditionType === "fog") {
-    tips.push("Bei Nebel Sichtbarkeit erhoehen und Wege mit Verkehr meiden.");
+    tips.push("Bei Nebel Sichtbarkeit erhöhen und Wege mit Verkehr meiden.");
   }
 
   if (conditionType === "snow") {
-    tips.push("Bei Schnee auf trockene, warme Aussenschicht und Fusswaerme achten.");
+    tips.push("Bei Schnee auf trockene, warme Außenschicht und Fußwärme achten.");
   }
 
   return tips;
@@ -407,26 +407,26 @@ function addSituationOutfitItems(outfit, situation, age, feelsLike, wind, rain) 
   if (situation === "stroller") {
     outfit.push("Kinderwagen-Windschutz/Abdeckung bereithalten.");
     if (feelsLike < 14) {
-      outfit.push("Kinderwagen-Decke oder Fusssack als Zusatzwaerme einplanen.");
+      outfit.push("Kinderwagen-Decke oder Fußsack als Zusatzwärme einplanen.");
     }
     if (rain > 0) {
-      outfit.push("Regenschutz fuer den Kinderwagen mitnehmen.");
+      outfit.push("Regenschutz für den Kinderwagen mitnehmen.");
     }
     return;
   }
 
   if (situation === "carrier") {
-    outfit.push("In der Trage lieber duenn schichten und dicke Overalls vermeiden.");
+    outfit.push("In der Trage lieber dünn schichten und dicke Overalls vermeiden.");
     outfit.push("Nacken und Atembereich in der Trage frei halten.");
     if (age === "newborn" || feelsLike < 10) {
-      outfit.push("Fuesse und Beine in der Trage zusaetzlich warm halten.");
+      outfit.push("Füße und Beine in der Trage zusätzlich warm halten.");
     }
     return;
   }
 
   // Normal draussen (aktiv)
   if (wind >= 15) {
-    outfit.push("Leichte winddichte Schicht fuer aktive Abschnitte bereithalten.");
+    outfit.push("Leichte winddichte Schicht für aktive Abschnitte bereithalten.");
   }
 }
 
@@ -436,9 +436,9 @@ function getOutfitDedupKey(item) {
   if (text.includes("windschutz") || text.includes("winddichte")) return "windschutz";
   if (text.includes("body")) return "body";
   if (text.includes("midlayer") || text.includes("strickjacke") || text.includes("pullover") || text.includes("hoodie")) return "midlayer";
-  if (text.includes("jacke") || text.includes("overall") || text.includes("aussenschicht")) return "outer";
-  if (text.includes("muetze") || text.includes("kopfschutz") || text.includes("sonnenhut")) return "head";
-  if (text.includes("socken") || text.includes("fuesse") || text.includes("beine")) return "feet";
+  if (text.includes("jacke") || text.includes("overall") || text.includes("außenschicht")) return "outer";
+  if (text.includes("mütze") || text.includes("kopfschutz") || text.includes("sonnenhut")) return "head";
+  if (text.includes("socken") || text.includes("füße") || text.includes("beine")) return "feet";
   if (text.includes("extraschicht") || text.includes("zusatzschicht")) return "extra-layer";
 
   return text.replace(/[^a-z0-9]+/g, " ").trim();
@@ -490,7 +490,7 @@ function applySafetyLayerRules(outfit, feelsLike, wind, rain) {
     (item) =>
       item.includes("jacke") ||
       item.includes("overall") ||
-      item.includes("aussenschicht") ||
+      item.includes("außenschicht") ||
       item.includes("winddicht")
   );
 
@@ -499,15 +499,15 @@ function applySafetyLayerRules(outfit, feelsLike, wind, rain) {
       outfit.unshift("Body als Basis-Schicht.");
     }
     if (!hasMidlayer) {
-      outfit.push("Zusaetzlicher Midlayer (z. B. Strickjacke/Fleece) einplanen.");
+      outfit.push("Zusätzlicher Midlayer (z. B. Strickjacke/Fleece) einplanen.");
     }
     if (!hasOuter) {
-      outfit.push("Wind- und wetterfeste Aussenschicht (Jacke/Overall) anziehen.");
+      outfit.push("Wind- und wetterfeste Außenschicht (Jacke/Overall) anziehen.");
     }
   }
 
   if (rain > 0 || wind >= 15) {
-    outfit.push("Bei Regen/Wind eine zusaetzliche Schicht einplanen.");
+    outfit.push("Bei Regen/Wind eine zusätzliche Schicht einplanen.");
   }
 }
 
@@ -524,26 +524,26 @@ function renderRecommendation({ temp, wind, rain, age, situation }) {
   applySafetyLayerRules(outfit, recommendationIndex, wind, rain);
 
   if (recommendationAdjustment >= 1.5) {
-    tips.push("Wind/Naesse beruecksichtigt: Empfehlung faellt bewusst etwas waermer aus.");
+    tips.push("Wind/Nässe berücksichtigt: Empfehlung fällt bewusst etwas wärmer aus.");
   }
 
   if (age === "newborn") {
     if (situation === "stroller") {
-      tips.push("Neugeboren im Kinderwagen: Temperatur haeufiger pruefen (Nacken-Check).");
+      tips.push("Neugeboren im Kinderwagen: Temperatur häufiger prüfen (Nacken-Check).");
     } else if (situation === "carrier") {
-      tips.push("Neugeboren in der Trage: Hitzestau zwischen Koerpern vermeiden.");
+      tips.push("Neugeboren in der Trage: Hitzestau zwischen Körpern vermeiden.");
     }
   } else if (age === "baby" && situation === "carrier") {
-    tips.push("Bei Babys in der Trage auf Waermestau achten und Schichten flexibel halten.");
+    tips.push("Bei Babys in der Trage auf Wärmestau achten und Schichten flexibel halten.");
   } else if (age === "toddler" && situation === "active") {
-    tips.push("Aktive Kleinkinder waermen schnell auf: Schichten unterwegs leicht reduzierbar halten.");
+    tips.push("Aktive Kleinkinder wärmen schnell auf: Schichten unterwegs leicht reduzierbar halten.");
   }
 
   if (rain > 0) {
     outfit.push("Regenschutz (z. B. Regenhaube/Abdeckung) mitnehmen.");
   }
 
-  outfit.push("Optional zusaetzlich: eine duenne Extraschicht (z. B. Cardigan/Weste) mitnehmen.");
+  outfit.push("Optional zusätzlich: eine dünne Extraschicht (z. B. Cardigan/Weste) mitnehmen.");
 
   const cleanedOutfit = dedupeOutfitItems(outfit);
 
@@ -573,11 +573,11 @@ function readFormValues() {
   const situation = el.situation.value;
 
   if (temp === null || wind === null || rain === null) {
-    throw new Error("Wetterdaten sind unvollstaendig. Bitte erneut laden.");
+    throw new Error("Wetterdaten sind unvollständig. Bitte erneut laden.");
   }
 
   if (rain < 0 || wind < 0) {
-    throw new Error("Wind und Regen duerfen nicht negativ sein.");
+    throw new Error("Wind und Regen dürfen nicht negativ sein.");
   }
 
   return { temp, wind, rain, age, situation };
@@ -603,7 +603,7 @@ async function fetchWeather(lat, lon) {
   const current = data?.current;
 
   if (!current) {
-    throw new Error("Open-Meteo Antwort unvollstaendig.");
+    throw new Error("Open-Meteo Antwort unvollständig.");
   }
 
   const temp = toNumber(current.temperature_2m);
@@ -662,13 +662,13 @@ async function fetchReverseLocation(lat, lon) {
     if (named) return named;
   }
 
-  throw new Error("Ort fuer Standort konnte nicht ermittelt werden.");
+  throw new Error("Ort für Standort konnte nicht ermittelt werden.");
 }
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Geolocation wird von diesem Browser nicht unterstuetzt."));
+      reject(new Error("Geolocation wird von diesem Browser nicht unterstützt."));
       return;
     }
 
@@ -728,13 +728,13 @@ async function loadWeatherForLocation(location, sourceText) {
   const lon = toNumber(location.longitude);
 
   if (lat === null || lon === null) {
-    throw new Error("Ungueltige Koordinaten fuer den Ort.");
+    throw new Error("Ungültige Koordinaten für den Ort.");
   }
 
   setStatus("Wetter wird geladen...");
   const weather = await fetchWeather(lat, lon);
   applyWeatherToForm(weather);
-  setStatus(`Wetterdaten uebernommen (${sourceText}).`);
+  setStatus(`Wetterdaten übernommen (${sourceText}).`);
 }
 
 async function handleGeoClick() {
@@ -766,7 +766,7 @@ async function handleGeoClick() {
           ...nearest,
           latitude,
           longitude,
-          label: `Naechster Ort: ${nearest.label}`,
+          label: `Nächster Ort: ${nearest.label}`,
         };
       }
     }
@@ -775,7 +775,7 @@ async function handleGeoClick() {
     await loadWeatherForLocation(currentLocation, formatLocationName(currentLocation));
   } catch (error) {
     setStatus(
-      `Standort/Wetter nicht verfuegbar: ${error.message}. Nutze die Ortssuche oder versuche es erneut.`,
+      `Standort/Wetter nicht verfügbar: ${error.message}. Nutze die Ortssuche oder versuche es erneut.`,
       true
     );
   } finally {
@@ -787,7 +787,7 @@ async function handleLocationSearch() {
   const query = el.locationQuery.value.trim();
 
   if (query.length < 2) {
-    setStatus("Bitte mindestens 2 Zeichen fuer die Ortssuche eingeben.", true);
+    setStatus("Bitte mindestens 2 Zeichen für die Ortssuche eingeben.", true);
     return;
   }
 
@@ -812,7 +812,7 @@ async function handleLocationPick(selectedIndex) {
   const item = locationResultsCache[selectedIndex];
 
   if (!item) {
-    setStatus("Ausgewaehlter Ort konnte nicht gelesen werden.", true);
+    setStatus("Ausgewählter Ort konnte nicht gelesen werden.", true);
     return;
   }
 

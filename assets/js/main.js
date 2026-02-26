@@ -12,6 +12,9 @@
   }
 
   function detectCurrentPage(pathname) {
+    if (pathname.indexOf('/impressum/') !== -1 || pathname.indexOf('/datenschutz/') !== -1) {
+      return '';
+    }
     if (pathname.indexOf('/tools/babywetter/') !== -1) {
       return 'babywetter';
     }

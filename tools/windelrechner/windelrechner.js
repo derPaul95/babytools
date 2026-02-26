@@ -1,7 +1,7 @@
 (function () {
   const PRESETS = {
     newborn: { perDay: 10, label: 'Neugeboren (0-2 Monate)' },
-    infant: { perDay: 8, label: 'Saeugling (3-5 Monate)' },
+    infant: { perDay: 8, label: 'Säugling (3-5 Monate)' },
     baby: { perDay: 7, label: 'Baby (6-11 Monate)' },
     'toddler-1': { perDay: 6, label: 'Kleinkind (12-23 Monate)' },
     'toddler-2': { perDay: 5, label: 'Kleinkind (24+ Monate)' },
@@ -85,19 +85,19 @@
 
   function validateInputs(data) {
     if (!PRESETS[data.ageClass]) {
-      return 'Bitte eine gueltige Altersklasse auswaehlen.';
+      return 'Bitte eine gültige Altersklasse auswählen.';
     }
 
     if (data.periodDays === null || data.periodDays < 1) {
-      return 'Bitte einen gueltigen Zeitraum in Tagen angeben.';
+      return 'Bitte einen gültigen Zeitraum in Tagen angeben.';
     }
 
     if (data.packSize === null || data.packSize < 1) {
-      return 'Bitte eine gueltige Packungsgroesse angeben.';
+      return 'Bitte eine gültige Packungsgröße angeben.';
     }
 
     if (data.packPrice === null || data.packPrice < 0) {
-      return 'Bitte einen gueltigen Preis pro Packung angeben.';
+      return 'Bitte einen gültigen Preis pro Packung angeben.';
     }
 
     if (data.reserve === null || data.reserve < 0 || data.reserve > 100) {
@@ -146,11 +146,11 @@
 
   function getTip(result) {
     if (result.packs <= 2) {
-      return 'Kleine Menge geplant: achte auf haeufige Angebotspruefung statt Vorratskauf.';
+      return 'Kleine Menge geplant: achte auf häufige Angebotsprüfung statt Vorratskauf.';
     }
 
     if (result.packs >= 10) {
-      return 'Grosse Menge: pruefe Staffelpreise oder Monatsboxen fuer niedrigeren Stueckpreis.';
+      return 'Große Menge: prüfe Staffelpreise oder Monatsboxen für niedrigeren Stückpreis.';
     }
 
     return 'Mittlere Menge: 1-2 Reservepackungen sind meist sinnvoll.';

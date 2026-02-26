@@ -1,6 +1,6 @@
 # BabyTools
 
-Statische Multi-Page Website (Vanilla HTML/CSS/JS) fuer kleine Familien-Tools.
+Statische Multi-Page Website (Vanilla HTML/CSS/JS) für kleine Familien-Tools.
 
 ## Struktur
 
@@ -11,12 +11,15 @@ Statische Multi-Page Website (Vanilla HTML/CSS/JS) fuer kleine Familien-Tools.
 - `tools/babywetter/babywetter.js` -> BabyWetter-Logik
 - `tools/windelrechner/index.html` -> Toolseite
 - `tools/windelrechner/windelrechner.js` -> Windel-Rechner-Logik
+- `impressum/index.html` -> Impressum (Platzhalter bitte ersetzen)
+- `datenschutz/index.html` -> Datenschutzerklärung (Platzhalter bitte ersetzen)
+- `assets/partials/affiliate-hinweis.html` -> Optionaler Hinweisblock für spätere Artikel
 - `404.html` -> Fallback-Seite
 
 ## Lokal starten
 
-1. Repo oeffnen.
-2. `index.html` im Browser oeffnen oder lokal mit einem einfachen Webserver starten.
+1. Repo öffnen.
+2. `index.html` im Browser öffnen oder lokal mit einem einfachen Webserver starten.
 
 Beispiel:
 
@@ -39,3 +42,17 @@ Alle Links sind relativ gehalten, damit Deployments unter einem Unterpfad wie `/
 - Kein Tracking
 - Keine Cookies
 - Keine externen Analytics-Skripte
+
+## Legal pages added
+
+Impressum und Datenschutz sind als statische, direkt aufrufbare Seiten angelegt und
+von allen Seiten im Footer verlinkt.
+
+Vor Livegang bitte diese Platzhalter ersetzen:
+
+- `[VORNAME NACHNAME]`
+- `[STRASSE HAUSNUMMER]`
+- `[PLZ ORT]`
+- `[KONTAKT-EMAIL]`
+- `[TELEFON]` (optional, aber empfohlen)
+- `https://[DEINE-DOMAIN]/...` in den canonical-Links

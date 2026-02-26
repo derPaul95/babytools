@@ -167,8 +167,26 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.5rem;
   color: var(--muted);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-links a:hover {
+  color: var(--text);
 }
 
 .form-grid {
@@ -332,6 +350,42 @@ a:focus {
   color: var(--muted);
   font-size: 0.88rem;
   margin: 0.7rem 0 0;
+}
+
+.legal-page {
+  max-width: 760px;
+}
+
+.legal-card h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+}
+
+.legal-card h2 {
+  margin: 1.2rem 0 0.35rem;
+  font-size: 1.02rem;
+}
+
+.legal-card p {
+  margin: 0;
+  color: #334155;
+}
+
+.legal-card a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.affiliate-hinweis {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 0.85rem;
+  color: #334155;
+}
+
+.affiliate-hinweis p {
+  margin: 0;
 }
 
 @media (min-width: 760px) {

@@ -81,7 +81,7 @@
   background: #ffece2;
 }
 
-.windelrechner-page input,
+.windelrechner-page input:not([type='checkbox']),
 .windelrechner-page select {
   min-height: 2.75rem;
   padding: 0.58rem 0.7rem;
@@ -109,21 +109,28 @@
 }
 
 .windelrechner-page .checkbox-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
   gap: 0.55rem;
-  align-items: start;
+  align-items: flex-start;
   margin-top: 0.1rem;
 }
 
 .windelrechner-page .checkbox-row input {
-  width: auto;
-  margin-top: 0.28rem;
+  appearance: auto;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 1.05rem;
+  margin: 0.15rem 0 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .windelrechner-page .checkbox-row label {
   font-weight: 500;
   line-height: 1.35;
+  margin: 0;
 }
 
 .windelrechner-page .btn-primary {
