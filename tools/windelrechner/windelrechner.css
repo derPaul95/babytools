@@ -36,6 +36,81 @@
   font-size: 0.85rem;
 }
 
+.windelrechner-page #calcForm {
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.windelrechner-page .form-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.windelrechner-page .form-col {
+  border: 1px solid #efe5db;
+  border-radius: 14px;
+  background: #fffdfa;
+  padding: 0.8rem;
+}
+
+.windelrechner-page .col-title {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+}
+
+.windelrechner-page .choice-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.windelrechner-page .choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.windelrechner-page .choice-btn {
+  border: 1px solid #e6d8ce;
+  background: #fff8f4;
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.windelrechner-page .choice-btn.is-active {
+  border-color: #e7a98f;
+  background: #ffece2;
+}
+
+.windelrechner-page input,
+.windelrechner-page select {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.72rem;
+  font-size: 1rem;
+}
+
+.windelrechner-page .inline-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.windelrechner-page .inline-suffix {
+  color: var(--wr-muted);
+  font-weight: 600;
+}
+
+.windelrechner-page .period-group {
+  margin-bottom: 0.45rem;
+}
+
+.windelrechner-page .period-btn {
+  min-width: 3rem;
+}
+
 .windelrechner-page .checkbox-row {
   display: flex;
   gap: 0.55rem;
@@ -57,6 +132,20 @@
 
 .windelrechner-page .btn-primary:hover {
   background: #bf5426;
+}
+
+.windelrechner-page .form-actions {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.windelrechner-page .form-actions .btn-primary {
+  justify-self: start;
+  min-width: 10rem;
+}
+
+.windelrechner-page .form-actions .status {
+  margin: 0;
 }
 
 .windelrechner-page .summary {
@@ -95,5 +184,16 @@
 @media (min-width: 720px) {
   .windelrechner-page .page {
     padding: 1.4rem;
+  }
+
+  .windelrechner-page .form-columns {
+    grid-template-columns: 1.45fr 1fr;
+    align-items: start;
+  }
+
+  .windelrechner-page .form-actions {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 0.8rem;
   }
 }

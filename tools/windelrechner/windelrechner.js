@@ -1,16 +1,18 @@
 (function () {
-  const PRESETS = [
-    { maxMonths: 2, perDay: 10, label: 'Neugeboren (0-2 Monate)' },
-    { maxMonths: 5, perDay: 8, label: 'Saeugling (3-5 Monate)' },
-    { maxMonths: 11, perDay: 7, label: 'Baby (6-11 Monate)' },
-    { maxMonths: 23, perDay: 6, label: 'Kleinkind (12-23 Monate)' },
-    { maxMonths: 60, perDay: 5, label: 'Kleinkind (24+ Monate)' },
-  ];
+  const PRESETS = {
+    newborn: { perDay: 10, label: 'Neugeboren (0-2 Monate)' },
+    infant: { perDay: 8, label: 'Saeugling (3-5 Monate)' },
+    baby: { perDay: 7, label: 'Baby (6-11 Monate)' },
+    'toddler-1': { perDay: 6, label: 'Kleinkind (12-23 Monate)' },
+    'toddler-2': { perDay: 5, label: 'Kleinkind (24+ Monate)' },
+  };
 
   const el = {
     form: document.getElementById('calcForm'),
-    ageMonths: document.getElementById('ageMonths'),
+    ageClass: document.getElementById('ageClass'),
     ageHint: document.getElementById('ageHint'),
+    choiceButtons: document.querySelectorAll('.choice-btn'),
+    periodButtons: document.querySelectorAll('.period-btn'),
     customPerDay: document.getElementById('customPerDay'),
     periodDays: document.getElementById('periodDays'),
     packSize: document.getElementById('packSize'),
@@ -43,13 +45,12 @@
     }).format(value);
   }
 
-  function getPresetByAge(months) {
-    return PRESETS.find((item) => months <= item.maxMonths) || PRESETS[PRESETS.length - 1];
+  function getPresetByClass(ageClass) {
+    return PRESETS[ageClass] || PRESETS.newborn;
   }
 
   function setAgeHint() {
-    const months = Math.max(0, toNumber(el.ageMonths.value) || 0);
-    const preset = getPresetByAge(months);
+    const preset = getPresetByClass(el.ageClass.value);
     el.ageHint.textContent = `Richtwert: ${preset.perDay} Windeln/Tag (${preset.label})`;
   }
 
@@ -59,8 +60,12 @@
   }
 
   function validateInputs(data) {
-    if (data.ageMonths === null || data.ageMonths < 0) {
-      return 'Bitte ein gueltiges Alter in Monaten angeben.';
+    if (!PRESETS[data.ageClass]) {
+      return 'Bitte eine gueltige Altersklasse auswaehlen.';
+    }
+
+    if (data.periodDays === null || data.periodDays < 1) {
+      return 'Bitte einen gueltigen Zeitraum in Tagen angeben.';
     }
 
     if (data.packSize === null || data.packSize < 1) {
@@ -84,7 +89,7 @@
 
   function readForm() {
     return {
-      ageMonths: toNumber(el.ageMonths.value),
+      ageClass: el.ageClass.value,
       customPerDay: el.customPerDay.value === '' ? null : toNumber(el.customPerDay.value),
       periodDays: toNumber(el.periodDays.value),
       packSize: toNumber(el.packSize.value),
@@ -95,7 +100,7 @@
   }
 
   function calculate(data) {
-    const preset = getPresetByAge(data.ageMonths);
+    const preset = getPresetByClass(data.ageClass);
     const basePerDay = data.customPerDay !== null ? data.customPerDay : preset.perDay;
     const plannedPerDay = basePerDay + (data.nightExtra ? 1 : 0);
 
@@ -161,7 +166,44 @@
     render(data, result);
   }
 
+  function onChoiceClick(event) {
+    const button = event.target.closest('.choice-btn');
+    if (!button) return;
+
+    const target = button.getAttribute('data-target');
+    const value = button.getAttribute('data-value');
+    if (!value) return;
+
+    if (target === 'ageClass') {
+      el.choiceButtons.forEach((item) => {
+        if (item.getAttribute('data-target') !== 'ageClass') return;
+        const active = item === button;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      el.ageClass.value = value;
+      setAgeHint();
+      return;
+    }
+
+    if (target === 'periodDays') {
+      el.periodDays.value = value;
+      updatePeriodButtons();
+    }
+  }
+
+  function updatePeriodButtons() {
+    const current = String(el.periodDays.value);
+    el.periodButtons.forEach((item) => {
+      const active = item.getAttribute('data-value') === current;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
   el.form.addEventListener('submit', onSubmit);
-  el.ageMonths.addEventListener('input', setAgeHint);
+  el.form.addEventListener('click', onChoiceClick);
+  el.periodDays.addEventListener('input', updatePeriodButtons);
   setAgeHint();
+  updatePeriodButtons();
 })();
