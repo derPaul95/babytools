@@ -1,67 +1,38 @@
 # BabyTools
 
-BabyTools ist ein minimales, statisches Webprojekt in Vanilla HTML/CSS/JS (ohne Build-System, ohne Framework, ohne Backend).
+Statische Multi-Page Website (Vanilla HTML/CSS/JS) fuer kleine Familien-Tools.
 
-Enthalten ist das Tool **BabyWetter**: eine Outfit-Empfehlung fuer Babys/Kleinkinder auf Basis von Wetterdaten, Altersklasse und Situation.
+## Struktur
 
-## Aktueller Funktionsumfang
-
-- Wetter laden ueber:
-  - `Standort verwenden` (Geolocation)
-  - `Ort suchen` (Open-Meteo Geocoding)
-- Treffer werden als klickbare Buttons angezeigt.
-- Bei `Standort verwenden` wird der Ortsname per Reverse-Geocoding aufgeloest.
-  - Falls kein Name gefunden wird: Fallback auf naechsten Ort aus interner Liste.
-- Altersklassen als Button-Auswahl:
-  - `Neugeboren (0-3)`
-  - `Baby (4-12)`
-  - `Kleinkind (1-3)`
-- Situationen als Button-Auswahl:
-  - `Kinderwagen`
-  - `Normal draussen`
-  - `Trage`
-- Ergebnisdarstellung mit visuellen Karten:
-  - Temperatur
-  - Gefuehlte Temperatur
-  - Risiko (inkl. Badge + Icon)
-- Outfit-Ausgabe als nummerierte Layer-Stufen.
-- Hinweise als kompakte Info-Chips.
-- Robuste Fehlerbehandlung mit Statusmeldungen und Fallbacks.
-
-## Logik (Kurz)
-
-- Gefuehlte Temperatur wird ueber Temperatur, Wind und Regen approximiert.
-- Altersklasse und Situation haben eigene Regelsets/Offsets.
-- Zusaetzliche Sicherheitsregeln greifen bei Kaelte, Wind und Naesse.
-- Wetterbedingung (`weather_code`) beeinflusst Hinweise (z. B. Sonne, Nebel, Schnee).
-- Eine optionale Zusatzschicht wird immer empfohlen.
+- `index.html` -> Landingpage mit Tool-Kacheln
+- `assets/css/main.css` -> gemeinsame Styles
+- `assets/js/main.js` -> globale Funktionen (Footer-Jahr, aktiver Nav-Link)
+- `tools/babywetter/index.html` -> Toolseite
+- `tools/babywetter/babywetter.js` -> BabyWetter-Logik
+- `404.html` -> Fallback-Seite
 
 ## Lokal starten
 
-1. Projektordner oeffnen.
-2. `index.html` per Doppelklick im Browser oeffnen.
+1. Repo oeffnen.
+2. `index.html` im Browser oeffnen oder lokal mit einem einfachen Webserver starten.
 
-Hinweis: Fuer Geolocation kann je nach Browser ein lokaler Webserver sinnvoll sein.
+Beispiel:
 
-## Datenquellen
+```bash
+python3 -m http.server 8000
+```
 
-Open-Meteo APIs:
+Dann aufrufen:
 
-- Forecast: `https://api.open-meteo.com/v1/forecast`
-  - Felder: `temperature_2m`, `wind_speed_10m`, `precipitation`, `weather_code`
-- Geocoding: `https://geocoding-api.open-meteo.com/v1/search`
-- Reverse Geocoding: `https://geocoding-api.open-meteo.com/v1/reverse`
+- `http://localhost:8000/`
+- `http://localhost:8000/tools/babywetter/`
 
-## Deployment auf GitHub Pages (kurz)
+## GitHub Pages (Project Page)
 
-1. Repository nach GitHub pushen.
-2. In GitHub: `Settings` -> `Pages`.
-3. Unter `Build and deployment` bei `Source` waehlen: `Deploy from a branch`.
-4. Branch `main` (oder `master`) und Ordner `/ (root)` auswaehlen.
-5. Speichern und auf die veroeffentlichte URL warten.
+Alle Links sind relativ gehalten, damit Deployments unter einem Unterpfad wie `/Babytools/` funktionieren.
 
 ## Datenschutz
 
-- Keine Cookies
 - Kein Tracking
+- Keine Cookies
 - Keine externen Analytics-Skripte

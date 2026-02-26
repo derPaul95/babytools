@@ -1,70 +1,49 @@
-:root {
+.babywetter-page {
   color-scheme: light;
-  --bg: #fff9f3;
-  --surface: #ffffff;
-  --text: #263238;
-  --muted: #5f6b73;
-  --primary: #39bfa7;
-  --primary-hover: #2ea892;
-  --border: #e9dff4;
-  --danger: #4a90e2;
-  --warn: #ff7a59;
-  --ok: #4caf50;
-  --radius: 16px;
-  --blue-soft: #dff4ff;
-  --mint-soft: #dbf8f1;
-  --apricot-soft: #ffe7c8;
-  --lavender-soft: #efe5ff;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: "Trebuchet MS", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --bw-bg: #fff9f3;
+  --bw-surface: #ffffff;
+  --bw-text: #263238;
+  --bw-muted: #5f6b73;
+  --bw-primary: #39bfa7;
+  --bw-primary-hover: #2ea892;
+  --bw-border: #e9dff4;
+  --bw-danger: #4a90e2;
+  --bw-warn: #ff7a59;
+  --bw-ok: #4caf50;
+  --bw-radius: 16px;
+  --bw-blue-soft: #dff4ff;
+  --bw-mint-soft: #dbf8f1;
+  --bw-apricot-soft: #ffe7c8;
+  --bw-lavender-soft: #efe5ff;
+  color: var(--bw-text);
   background:
-    radial-gradient(circle at 12% 8%, var(--blue-soft) 0, transparent 35%),
-    radial-gradient(circle at 88% 4%, var(--lavender-soft) 0, transparent 28%),
-    radial-gradient(circle at 80% 88%, var(--apricot-soft) 0, transparent 30%),
-    var(--bg);
-  color: var(--text);
-  line-height: 1.5;
+    radial-gradient(circle at 12% 8%, var(--bw-blue-soft) 0, transparent 35%),
+    radial-gradient(circle at 88% 4%, var(--bw-lavender-soft) 0, transparent 28%),
+    radial-gradient(circle at 80% 88%, var(--bw-apricot-soft) 0, transparent 30%),
+    var(--bw-bg);
 }
 
-.page {
+.babywetter-page .page {
   width: min(860px, 100%);
   margin: 0 auto;
   padding: 0.5rem 0.8rem 1rem;
 }
 
-h1 {
-  font-size: clamp(1.4rem, 4vw, 2rem);
-  margin: 0.35rem 0;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+.babywetter-page .card {
+  background: var(--bw-surface);
+  border: 1px solid var(--bw-border);
+  border-radius: var(--bw-radius);
   padding: 1.05rem;
   margin: 0 0 1rem;
   box-shadow: 0 10px 24px rgba(68, 53, 95, 0.08);
 }
 
-h2,
-h3 {
+.babywetter-page h2,
+.babywetter-page h3 {
   margin-top: 0;
 }
 
-.section-intro {
-  margin: -0.35rem 0 0.8rem;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.row {
+.babywetter-page .row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -72,48 +51,48 @@ h3 {
   margin-bottom: 1rem;
 }
 
-.status {
+.babywetter-page .status {
   margin: 0;
-  color: var(--muted);
+  color: var(--bw-muted);
   font-size: 0.95rem;
 }
 
-.search-wrap {
+.babywetter-page .search-wrap {
   margin: 0 0 1rem;
 }
 
-.search-label {
+.babywetter-page .search-label {
   display: block;
   margin: 0 0 0.35rem;
   font-weight: 600;
 }
 
-.search-controls {
+.babywetter-page .search-controls {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.6rem;
 }
 
-.search-controls button {
+.babywetter-page .search-controls button {
   white-space: nowrap;
 }
 
-#resultsLabel {
+.babywetter-page #resultsLabel {
   margin-top: 0.65rem;
 }
 
-.results-title {
+.babywetter-page .results-title {
   margin: 0 0 0.35rem;
   font-weight: 600;
 }
 
-.result-buttons {
+.babywetter-page .result-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
 }
 
-.result-btn {
+.babywetter-page .result-btn {
   border: 1px solid #d7e6ff;
   background: #f3f8ff;
   border-radius: 999px;
@@ -121,19 +100,19 @@ h3 {
   font-size: 0.9rem;
 }
 
-.result-btn.is-active {
+.babywetter-page .result-btn.is-active {
   background: #d8f5ee;
   border-color: #9fddcf;
 }
 
-.weather-view {
+.babywetter-page .weather-view {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   margin-bottom: 0.9rem;
 }
 
-.weather-card {
+.babywetter-page .weather-card {
   border: 1px solid #e8e2f4;
   border-radius: 14px;
   background: linear-gradient(180deg, #ffffff, #fdf8ff);
@@ -141,49 +120,49 @@ h3 {
   text-align: center;
 }
 
-.weather-symbol,
-.weather-label,
-.weather-value {
+.babywetter-page .weather-symbol,
+.babywetter-page .weather-label,
+.babywetter-page .weather-value {
   margin: 0;
 }
 
-.weather-symbol {
+.babywetter-page .weather-symbol {
   font-size: 1.2rem;
 }
 
-.weather-label {
-  color: var(--muted);
+.babywetter-page .weather-label {
+  color: var(--bw-muted);
   font-size: 0.82rem;
 }
 
-.weather-value {
+.babywetter-page .weather-value {
   margin-top: 0.2rem;
   font-weight: 700;
 }
 
-.grid {
+.babywetter-page .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
 }
 
-.choice-block {
+.babywetter-page .choice-block {
   display: grid;
   gap: 0.45rem;
 }
 
-.choice-title {
+.babywetter-page .choice-title {
   margin: 0;
   font-weight: 600;
 }
 
-.choice-group {
+.babywetter-page .choice-group {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
 }
 
-.choice-btn {
+.babywetter-page .choice-btn {
   border: 1px solid #d7e6ff;
   background: #f5f9ff;
   border-radius: 999px;
@@ -191,77 +170,74 @@ h3 {
   font-size: 0.92rem;
 }
 
-.choice-btn.is-active {
-  background: var(--mint-soft);
+.babywetter-page .choice-btn.is-active {
+  background: var(--bw-mint-soft);
   border-color: #96d9ca;
 }
 
-input,
-select,
-button {
+.babywetter-page input,
+.babywetter-page button {
   font: inherit;
 }
 
-input,
-select {
+.babywetter-page input {
   width: 100%;
   padding: 0.65rem 0.7rem;
   border: 1px solid #dfd7eb;
   border-radius: 12px;
   background: #fffdfa;
-  color: var(--text);
+  color: var(--bw-text);
 }
 
-input:focus,
-select:focus,
-button:focus {
+.babywetter-page input:focus,
+.babywetter-page button:focus {
   outline: 2px solid #9de7db;
   outline-offset: 2px;
 }
 
-button {
+.babywetter-page button {
   border: 1px solid transparent;
   border-radius: 12px;
   padding: 0.65rem 0.9rem;
   cursor: pointer;
   background: #eaf4ff;
-  color: var(--text);
+  color: var(--bw-text);
   font-weight: 600;
 }
 
-button:hover {
+.babywetter-page button:hover {
   background: #d8ebff;
 }
 
-button.primary {
-  background: var(--primary);
+.babywetter-page button.primary {
+  background: var(--bw-primary);
   color: #fff;
   margin-top: 0.9rem;
   box-shadow: 0 8px 16px rgba(57, 191, 167, 0.28);
 }
 
-button.primary:hover {
-  background: var(--primary-hover);
+.babywetter-page button.primary:hover {
+  background: var(--bw-primary-hover);
 }
 
-button:disabled {
+.babywetter-page button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-button.primary:disabled,
-button.primary:disabled:hover {
+.babywetter-page button.primary:disabled,
+.babywetter-page button.primary:disabled:hover {
   background: #94a3b8;
 }
 
-.metric-cards {
+.babywetter-page .metric-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   margin-bottom: 0.8rem;
 }
 
-.metric-card {
+.babywetter-page .metric-card {
   border: 1px solid #e7deef;
   border-radius: 14px;
   padding: 0.65rem 0.55rem;
@@ -269,27 +245,27 @@ button.primary:disabled:hover {
   text-align: center;
 }
 
-.metric-icon,
-.metric-label,
-.metric-value {
+.babywetter-page .metric-icon,
+.babywetter-page .metric-label,
+.babywetter-page .metric-value {
   margin: 0;
 }
 
-.metric-icon {
+.babywetter-page .metric-icon {
   font-size: 1.05rem;
 }
 
-.metric-label {
-  color: var(--muted);
+.babywetter-page .metric-label {
+  color: var(--bw-muted);
   font-size: 0.82rem;
 }
 
-.metric-value {
+.babywetter-page .metric-value {
   margin-top: 0.15rem;
   font-weight: 700;
 }
 
-.top-reco {
+.babywetter-page .top-reco {
   margin: 0.2rem 0 1rem;
   border: 1px solid #bce8da;
   background: #ecfbf5;
@@ -299,7 +275,7 @@ button.primary:disabled:hover {
   font-weight: 600;
 }
 
-.badge {
+.babywetter-page .badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
@@ -308,27 +284,22 @@ button.primary:disabled:hover {
   font-size: 0.85rem;
 }
 
-.badge.cold {
-  color: var(--danger);
+.babywetter-page .badge.cold {
+  color: var(--bw-danger);
   background: #e7f2ff;
 }
 
-.badge.normal {
-  color: var(--ok);
+.babywetter-page .badge.normal {
+  color: var(--bw-ok);
   background: #eaf8ea;
 }
 
-.badge.hot {
-  color: var(--warn);
+.babywetter-page .badge.hot {
+  color: var(--bw-warn);
   background: #ffe9e2;
 }
 
-ul {
-  margin: 0.4rem 0 1rem 1.1rem;
-  padding: 0;
-}
-
-.layer-list {
+.babywetter-page .layer-list {
   margin: 0.5rem 0 1rem;
   padding: 0;
   list-style: none;
@@ -336,7 +307,7 @@ ul {
   gap: 0.45rem;
 }
 
-.layer-item {
+.babywetter-page .layer-item {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.55rem;
@@ -347,7 +318,7 @@ ul {
   padding: 0.48rem 0.6rem;
 }
 
-.layer-step {
+.babywetter-page .layer-step {
   width: 1.4rem;
   height: 1.4rem;
   border-radius: 999px;
@@ -361,18 +332,18 @@ ul {
   margin-top: 0.08rem;
 }
 
-.layer-text {
+.babywetter-page .layer-text {
   margin: 0;
 }
 
-.tips-chips {
+.babywetter-page .tips-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-top: 0.35rem;
 }
 
-.tip-chip {
+.babywetter-page .tip-chip {
   border: 1px solid #d8e7ff;
   background: #f2f8ff;
   border-radius: 999px;
@@ -380,35 +351,35 @@ ul {
   font-size: 0.88rem;
 }
 
-.empty {
-  color: var(--muted);
+.babywetter-page .empty {
+  color: var(--bw-muted);
 }
 
-.hidden {
+.babywetter-page .hidden {
   display: none;
 }
 
-.disclaimer {
+.babywetter-page .disclaimer {
   font-size: 0.88rem;
-  color: var(--muted);
+  color: var(--bw-muted);
   padding: 0.25rem 0 1.5rem;
 }
 
 @media (min-width: 720px) {
-  .page {
+  .babywetter-page .page {
     padding: 1.4rem;
   }
 
-  .metric-cards {
+  .babywetter-page .metric-cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .weather-view {
+  .babywetter-page .weather-view {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.8rem;
   }
 
-  .grid {
+  .babywetter-page .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

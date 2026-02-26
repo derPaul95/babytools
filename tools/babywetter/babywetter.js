@@ -1,3 +1,4 @@
+(function () {
 const API_BASE = "https://api.open-meteo.com/v1/forecast";
 const GEO_API_BASE = "https://geocoding-api.open-meteo.com/v1/search";
 const GEO_REVERSE_API_BASE = "https://geocoding-api.open-meteo.com/v1/reverse";
@@ -870,3 +871,4 @@ el.searchBtn.addEventListener("click", handleLocationSearch);
 el.form.addEventListener("click", handleChoicePick);
 el.locationResults.addEventListener("click", handleLocationResultsClick);
 el.form.addEventListener("submit", handleFormSubmit);
+})();
