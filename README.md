@@ -9,6 +9,8 @@ Statische Multi-Page Website (Vanilla HTML/CSS/JS) fuer kleine Familien-Tools.
 - `assets/js/main.js` -> globale Funktionen (Footer-Jahr, aktiver Nav-Link)
 - `tools/babywetter/index.html` -> Toolseite
 - `tools/babywetter/babywetter.js` -> BabyWetter-Logik
+- `tools/windelrechner/index.html` -> Toolseite
+- `tools/windelrechner/windelrechner.js` -> Windel-Rechner-Logik
 - `404.html` -> Fallback-Seite
 
 ## Lokal starten
@@ -26,6 +28,7 @@ Dann aufrufen:
 
 - `http://localhost:8000/`
 - `http://localhost:8000/tools/babywetter/`
+- `http://localhost:8000/tools/windelrechner/`
 
 ## GitHub Pages (Project Page)
 

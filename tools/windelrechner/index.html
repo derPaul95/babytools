@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BabyTools | Windel-Rechner</title>
+    <meta
+      name="description"
+      content="Windel-Rechner fuer die einfache Planung von Windeln, Packungen und Kosten ueber einen Zeitraum."
+    />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+    <link rel="stylesheet" href="./windelrechner.css" />
+  </head>
+  <body class="windelrechner-page">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../../index.html">BabyTools</a>
+        <nav class="site-nav" aria-label="Hauptnavigation">
+          <a data-nav="home" href="../../index.html">Home</a>
+          <a data-nav="babywetter" href="../babywetter/">BabyWetter</a>
+          <a data-nav="windelrechner" href="./">Windel-Rechner</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="card intro-card">
+        <h1>Windel-Rechner</h1>
+        <p>
+          Plane den Windelbedarf fuer einen Zeitraum inkl. Reserve, Anzahl Packungen
+          und Kosten.
+        </p>
+      </section>
+
+      <section class="card" aria-labelledby="calc-heading">
+        <h2 id="calc-heading">Eingaben</h2>
+        <form id="calcForm" class="form-grid" novalidate>
+          <div class="field">
+            <label for="ageMonths">Alter (Monate)</label>
+            <input id="ageMonths" type="number" min="0" max="60" value="6" required />
+            <small id="ageHint" class="field-hint"></small>
+          </div>
+
+          <div class="field">
+            <label for="customPerDay">Eigener Verbrauch pro Tag (optional)</label>
+            <input id="customPerDay" type="number" min="0" max="20" step="0.5" placeholder="z. B. 7.5" />
+          </div>
+
+          <div class="field">
+            <label for="periodDays">Zeitraum</label>
+            <select id="periodDays">
+              <option value="14">14 Tage</option>
+              <option value="30" selected>30 Tage</option>
+              <option value="90">90 Tage</option>
+              <option value="365">365 Tage</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="packSize">Windeln pro Packung</label>
+            <input id="packSize" type="number" min="1" value="44" required />
+          </div>
+
+          <div class="field">
+            <label for="packPrice">Preis pro Packung (EUR)</label>
+            <input id="packPrice" type="number" min="0" step="0.01" value="13.99" required />
+          </div>
+
+          <div class="field">
+            <label for="reserve">Reserve in %</label>
+            <input id="reserve" type="number" min="0" max="100" value="10" required />
+          </div>
+
+          <div class="checkbox-row">
+            <input id="nightExtra" type="checkbox" />
+            <label for="nightExtra">1 zusaetzliche Nachtwindel pro Tag einplanen</label>
+          </div>
+
+          <button type="submit" class="btn-primary">Berechnen</button>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="result-heading">
+        <h2 id="result-heading">Ergebnis</h2>
+        <div id="emptyState" class="empty">Noch keine Berechnung vorhanden.</div>
+        <div id="result" class="hidden">
+          <p id="summary" class="summary"></p>
+
+          <div class="metrics">
+            <article class="metric">
+              <p class="metric-label">Windeln gesamt</p>
+              <p id="outTotalDiapers" class="metric-value">0</p>
+            </article>
+            <article class="metric">
+              <p class="metric-label">Packungen</p>
+              <p id="outPacks" class="metric-value">0</p>
+            </article>
+            <article class="metric">
+              <p class="metric-label">Gesamtkosten</p>
+              <p id="outTotalCost" class="metric-value">0 EUR</p>
+            </article>
+            <article class="metric">
+              <p class="metric-label">Kosten / Tag</p>
+              <p id="outPerDay" class="metric-value">0 EUR</p>
+            </article>
+            <article class="metric">
+              <p class="metric-label">Kosten / Windel</p>
+              <p id="outPerDiaper" class="metric-value">0 EUR</p>
+            </article>
+            <article class="metric">
+              <p class="metric-label">Geplanter Verbrauch / Tag</p>
+              <p id="outPlannedPerDay" class="metric-value">0</p>
+            </article>
+          </div>
+
+          <h3>Kauftipp</h3>
+          <p id="tip" class="tip"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-line">
+        <small>&copy; <span class="js-year"></span> BabyTools</small>
+        <small>Kein Tracking</small>
+      </div>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script src="./windelrechner.js"></script>
+  </body>
+</html>

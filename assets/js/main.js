@@ -15,6 +15,9 @@
     if (pathname.indexOf('/tools/babywetter/') !== -1) {
       return 'babywetter';
     }
+    if (pathname.indexOf('/tools/windelrechner/') !== -1) {
+      return 'windelrechner';
+    }
     return 'home';
   }
 

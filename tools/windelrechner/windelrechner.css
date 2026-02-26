@@ -1,0 +1,99 @@
+.windelrechner-page {
+  color-scheme: light;
+  --wr-bg: #fefbf6;
+  --wr-surface: #ffffff;
+  --wr-text: #1f2937;
+  --wr-muted: #5b6472;
+  --wr-border: #e7dece;
+  --wr-highlight: #d96832;
+  --wr-highlight-soft: #fff0e8;
+  background:
+    radial-gradient(circle at 9% 10%, #ffe4d1 0, transparent 33%),
+    radial-gradient(circle at 89% 0%, #dff1ff 0, transparent 26%),
+    var(--wr-bg);
+  color: var(--wr-text);
+}
+
+.windelrechner-page .page {
+  width: min(820px, 100%);
+  margin: 0 auto;
+  padding: 0.8rem;
+}
+
+.windelrechner-page .card {
+  background: var(--wr-surface);
+  border: 1px solid var(--wr-border);
+  border-radius: 16px;
+}
+
+.windelrechner-page .intro-card p {
+  margin: 0.35rem 0 0;
+  color: var(--wr-muted);
+}
+
+.windelrechner-page .field-hint {
+  color: var(--wr-muted);
+  font-size: 0.85rem;
+}
+
+.windelrechner-page .checkbox-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+}
+
+.windelrechner-page .checkbox-row input {
+  width: auto;
+  margin-top: 0.15rem;
+}
+
+.windelrechner-page .checkbox-row label {
+  font-weight: 500;
+}
+
+.windelrechner-page .btn-primary {
+  background: var(--wr-highlight);
+}
+
+.windelrechner-page .btn-primary:hover {
+  background: #bf5426;
+}
+
+.windelrechner-page .summary {
+  border: 1px solid #f1d4c4;
+  border-radius: 12px;
+  background: var(--wr-highlight-soft);
+  padding: 0.58rem 0.72rem;
+  margin: 0 0 0.8rem;
+  font-weight: 700;
+  color: #7f3615;
+}
+
+.windelrechner-page .metrics {
+  margin-bottom: 0.85rem;
+}
+
+.windelrechner-page .metric {
+  border-color: #ebdfd7;
+  background: linear-gradient(180deg, #ffffff, #fffaf6);
+}
+
+.windelrechner-page .tip {
+  margin: 0;
+  color: var(--wr-muted);
+}
+
+.windelrechner-page .empty,
+.windelrechner-page .hidden {
+  margin: 0;
+}
+
+.windelrechner-page .hidden {
+  display: none;
+}
+
+@media (min-width: 720px) {
+  .windelrechner-page .page {
+    padding: 1.4rem;
+  }
+}
