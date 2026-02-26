@@ -10,6 +10,7 @@
   const el = {
     form: document.getElementById('calcForm'),
     ageClass: document.getElementById('ageClass'),
+    ageClassSelect: document.getElementById('ageClassSelect'),
     ageHint: document.getElementById('ageHint'),
     choiceButtons: document.querySelectorAll('.choice-btn'),
     periodButtons: document.querySelectorAll('.period-btn'),
@@ -52,6 +53,29 @@
   function setAgeHint() {
     const preset = getPresetByClass(el.ageClass.value);
     el.ageHint.textContent = `Richtwert: ${preset.perDay} Windeln/Tag (${preset.label})`;
+  }
+
+  function syncAgeButtons() {
+    el.choiceButtons.forEach((item) => {
+      if (item.getAttribute('data-target') !== 'ageClass') return;
+      const active = item.getAttribute('data-value') === el.ageClass.value;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function syncAgeSelect() {
+    if (el.ageClassSelect) {
+      el.ageClassSelect.value = el.ageClass.value;
+    }
+  }
+
+  function setAgeClassValue(value) {
+    if (!PRESETS[value]) return;
+    el.ageClass.value = value;
+    syncAgeButtons();
+    syncAgeSelect();
+    setAgeHint();
   }
 
   function setStatus(message, isError) {
@@ -175,14 +199,7 @@
     if (!value) return;
 
     if (target === 'ageClass') {
-      el.choiceButtons.forEach((item) => {
-        if (item.getAttribute('data-target') !== 'ageClass') return;
-        const active = item === button;
-        item.classList.toggle('is-active', active);
-        item.setAttribute('aria-pressed', active ? 'true' : 'false');
-      });
-      el.ageClass.value = value;
-      setAgeHint();
+      setAgeClassValue(value);
       return;
     }
 
@@ -204,6 +221,11 @@
   el.form.addEventListener('submit', onSubmit);
   el.form.addEventListener('click', onChoiceClick);
   el.periodDays.addEventListener('input', updatePeriodButtons);
-  setAgeHint();
+  if (el.ageClassSelect) {
+    el.ageClassSelect.addEventListener('change', function (event) {
+      setAgeClassValue(event.target.value);
+    });
+  }
+  setAgeClassValue(el.ageClass.value);
   updatePeriodButtons();
 })();

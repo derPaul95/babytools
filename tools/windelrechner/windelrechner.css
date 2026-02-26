@@ -17,34 +17,49 @@
 .windelrechner-page .page {
   width: min(820px, 100%);
   margin: 0 auto;
-  padding: 0.8rem;
+  padding: 0.7rem;
 }
 
 .windelrechner-page .card {
   background: var(--wr-surface);
   border: 1px solid var(--wr-border);
   border-radius: 16px;
+  padding: 0.95rem;
 }
 
 .windelrechner-page .intro-card p {
-  margin: 0.35rem 0 0;
+  margin: 0.3rem 0 0;
   color: var(--wr-muted);
 }
 
 .windelrechner-page .field-hint {
   color: var(--wr-muted);
   font-size: 0.85rem;
+  margin-top: -0.05rem;
 }
 
 .windelrechner-page #calcForm {
   grid-template-columns: 1fr;
-  gap: 0.9rem;
+  gap: 0.75rem;
 }
 
 .windelrechner-page .choice-title {
   margin: 0;
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+.windelrechner-page .age-picker {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.windelrechner-page .age-select {
+  display: block;
+}
+
+.windelrechner-page .age-buttons {
+  display: none;
 }
 
 .windelrechner-page .choice-group {
@@ -69,8 +84,8 @@
 .windelrechner-page input,
 .windelrechner-page select {
   min-height: 2.75rem;
-  padding: 0.6rem 0.72rem;
-  font-size: 1rem;
+  padding: 0.58rem 0.7rem;
+  font-size: 0.98rem;
 }
 
 .windelrechner-page .inline-input {
@@ -86,7 +101,7 @@
 }
 
 .windelrechner-page .period-group {
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.35rem;
 }
 
 .windelrechner-page .period-btn {
@@ -94,18 +109,21 @@
 }
 
 .windelrechner-page .checkbox-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   gap: 0.55rem;
-  align-items: flex-start;
+  align-items: start;
+  margin-top: 0.1rem;
 }
 
 .windelrechner-page .checkbox-row input {
   width: auto;
-  margin-top: 0.15rem;
+  margin-top: 0.28rem;
 }
 
 .windelrechner-page .checkbox-row label {
   font-weight: 500;
+  line-height: 1.35;
 }
 
 .windelrechner-page .btn-primary {
@@ -119,6 +137,7 @@
 .windelrechner-page .form-actions {
   display: grid;
   gap: 0.35rem;
+  margin-top: 0.2rem;
 }
 
 .windelrechner-page .form-actions .btn-primary {
@@ -165,7 +184,19 @@
 
 @media (min-width: 720px) {
   .windelrechner-page .page {
-    padding: 1.4rem;
+    padding: 1.1rem;
+  }
+
+  .windelrechner-page .card {
+    padding: 1.15rem;
+  }
+
+  .windelrechner-page .age-select {
+    display: none;
+  }
+
+  .windelrechner-page .age-buttons {
+    display: flex;
   }
 
   .windelrechner-page .form-actions {
