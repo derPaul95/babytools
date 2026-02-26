@@ -58,6 +58,12 @@ h3 {
   margin-top: 0;
 }
 
+.section-intro {
+  margin: -0.35rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
