@@ -45,7 +45,7 @@ Alle Links sind relativ gehalten, damit Deployments unter einem Unterpfad wie `/
 ### Analytics andocken (optional)
 
 Die App feuert interne Events ueber `window.babytoolsTrack(...)`.
-Wenn GA4 (`gtag`) eingebunden ist, werden diese Events automatisch weitergereicht.
+GA4 wird nur nach Einwilligung geladen (Consent-Banner in `assets/js/analytics-consent.js`).
 
 Typische Events:
 
@@ -55,17 +55,13 @@ Typische Events:
 - `babywetter_mode_change`
 - `windelrechner_calculate`
 
-Beispiel GA4-Snippet (Measurement ID anpassen):
+Snippet im `<head>` (bereits eingebaut):
 
 ```html
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7ZHVCRYMKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', 'G-7ZHVCRYMKP');
-</script>
+<script src="./assets/js/analytics-consent.js"></script>
 ```
+
+Die Measurement-ID wird zentral in `assets/js/analytics-consent.js` gepflegt (`GA_ID`).
 
 ### Google Search Console (kostenlos)
 
