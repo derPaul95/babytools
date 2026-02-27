@@ -24,12 +24,24 @@
     <header class="site-header">
       <div class="container nav-wrap">
         <a class="brand" href="../../index.html">BabyTools</a>
-        <nav class="site-nav" aria-label="Hauptnavigation">
-          <a data-nav="home" href="../../index.html">Home</a>
-          <a data-nav="anziehen" href="../../baby-richtig-anziehen-temperatur/">Baby richtig anziehen</a>
-          <a data-nav="windelbedarf" href="../../windelbedarf-baby/">Windelbedarf im 1. Jahr</a>
-          <a data-nav="babywetter" href="../babywetter/">BabyWetter</a>
-          <a data-nav="windelrechner" href="./">Windel-Rechner</a>
+        <button class="menu-toggle" type="button" aria-label="Menue oeffnen" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>☰</button>
+        <nav id="site-menu" class="site-nav" aria-label="Hauptnavigation" data-site-menu>
+          <section class="menu-section" aria-label="Tools">
+            <a class="menu-main-link" data-nav="tools" href="../../index.html#tools-heading">Tools</a>
+            <div class="menu-links">
+              <a href="../../tools/babywetter/">BabyWetter</a>
+              <a href="../../tools/windelrechner/">Windel-Rechner</a>
+            </div>
+          </section>
+          <section class="menu-section" aria-label="Ratgeber">
+            <a class="menu-main-link" data-nav="ratgeber" href="../../index.html#ratgeber-heading">Ratgeber</a>
+            <div class="menu-links">
+              <a href="../../baby-richtig-anziehen-temperatur/">Baby richtig anziehen</a>
+              <a href="../../windelbedarf-baby/">Windelbedarf im 1. Jahr</a>
+              <a href="../../baby-anziehen-nachts-temperatur/">Baby nachts richtig anziehen</a>
+              <a href="../../windeln-pro-monat-baby/">Windeln pro Monat</a>
+            </div>
+          </section>
         </nav>
       </div>
     </header>
