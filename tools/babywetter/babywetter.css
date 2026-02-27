@@ -140,10 +140,20 @@
   font-weight: 700;
 }
 
+.babywetter-page .weather-subvalue {
+  margin: 0.2rem 0 0;
+  color: var(--bw-muted);
+  font-size: 0.8rem;
+}
+
 .babywetter-page .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
+}
+
+.babywetter-page .mode-block {
+  margin-bottom: 0.8rem;
 }
 
 .babywetter-page .choice-block {
@@ -343,6 +353,61 @@
   margin-top: 0.35rem;
 }
 
+.babywetter-page .carry-list {
+  margin: 0.45rem 0 1rem;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.babywetter-page .day-cards {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.babywetter-page .day-card {
+  border: 1px solid #e8e1f0;
+  border-radius: 12px;
+  background: #fffdfb;
+  padding: 0.6rem;
+}
+
+.babywetter-page .day-card h4 {
+  margin: 0 0 0.45rem;
+}
+
+.babywetter-page .day-empty {
+  margin: 0;
+  color: var(--bw-muted);
+}
+
+.babywetter-page .day-metrics {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.babywetter-page .day-metrics p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.babywetter-page .day-subtitle {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.babywetter-page .layer-list.compact {
+  margin-top: 0.4rem;
+}
+
+.babywetter-page .day-hint {
+  margin: 0.35rem 0 0;
+  color: #36515a;
+  font-size: 0.9rem;
+}
+
 .babywetter-page .tip-chip {
   border: 1px solid #d8e7ff;
   background: #f2f8ff;
@@ -381,5 +446,9 @@
 
   .babywetter-page .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .babywetter-page .day-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

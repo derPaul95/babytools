@@ -8,6 +8,14 @@
       name="description"
       content="BabyWetter hilft mit einer einfachen Outfit-Empfehlung für Babys basierend auf Wetter und Alter."
     />
+    <link rel="canonical" href="https://babytool.app/tools/babywetter/" />
+    <meta property="og:title" content="Babywetter-Tool: Kleidungsempfehlung nach Wetter" />
+    <meta
+      property="og:description"
+      content="Babywetter-Tool fuer schnelle Kleidungsempfehlungen nach Temperatur, Wind und Regen."
+    />
+    <meta property="og:url" content="https://babytool.app/tools/babywetter/" />
+    <meta property="og:type" content="website" />
     <link rel="stylesheet" href="../../assets/css/main.css" />
     <link rel="stylesheet" href="./babywetter.css" />
   </head>
@@ -17,6 +25,8 @@
         <a class="brand" href="../../index.html">BabyTools</a>
         <nav class="site-nav" aria-label="Hauptnavigation">
           <a data-nav="home" href="../../index.html">Home</a>
+          <a data-nav="anziehen" href="../../baby-richtig-anziehen-temperatur/">Baby richtig anziehen</a>
+          <a data-nav="windelbedarf" href="../../windelbedarf-baby/">Windelbedarf im 1. Jahr</a>
           <a data-nav="babywetter" href="./">BabyWetter</a>
           <a data-nav="windelrechner" href="../windelrechner/">Windel-Rechner</a>
         </nav>
@@ -48,26 +58,31 @@
         </div>
 
         <form id="weatherForm" novalidate>
+          <input id="mode" type="hidden" value="now" />
           <div class="weather-view" aria-live="polite">
             <div class="weather-card">
               <p class="weather-symbol" aria-hidden="true">🌡️</p>
               <p class="weather-label">Temperatur</p>
               <p id="tempValue" class="weather-value">--.- °C</p>
+              <p id="dayRangeValue" class="weather-subvalue">Tag: -- bis -- °C</p>
             </div>
             <div class="weather-card">
               <p class="weather-symbol" aria-hidden="true">💨</p>
               <p class="weather-label">Wind</p>
               <p id="windValue" class="weather-value">--.- km/h</p>
+              <p id="dayWindValue" class="weather-subvalue">Tag: -- bis -- km/h</p>
             </div>
             <div class="weather-card">
               <p class="weather-symbol" aria-hidden="true">🌧️</p>
               <p class="weather-label">Regen</p>
               <p id="rainValue" class="weather-value">--.- mm/h</p>
+              <p id="dayRainValue" class="weather-subvalue">Tag: -- bis -- mm/h</p>
             </div>
             <div class="weather-card">
               <p id="conditionSymbol" class="weather-symbol" aria-hidden="true">☁️</p>
               <p class="weather-label">Bedingung</p>
               <p id="conditionValue" class="weather-value">Unbekannt</p>
+              <p id="dayConditionValue" class="weather-subvalue">Tag: --</p>
             </div>
           </div>
 
@@ -101,6 +116,13 @@
 
       <section class="card" aria-labelledby="result-heading">
         <h2 id="result-heading">Empfehlung</h2>
+        <div id="modeSwitch" class="choice-block mode-block">
+          <p class="choice-title">Empfehlungsmodus</p>
+          <div class="choice-group" role="radiogroup" aria-label="Empfehlungsmodus">
+            <button type="button" class="choice-btn is-active" data-target="mode" data-value="now" aria-pressed="true">Jetzt</button>
+            <button type="button" class="choice-btn" data-target="mode" data-value="day" aria-pressed="false">Tagesverlauf</button>
+          </div>
+        </div>
 
         <div id="emptyState" class="empty">Noch keine Empfehlung berechnet.</div>
 
@@ -131,12 +153,27 @@
           <h3>Hinweise</h3>
           <div id="tipsList" class="tips-chips"></div>
         </div>
+
+        <div id="dayResult" class="hidden">
+          <h3>Mitnehmen</h3>
+          <ul id="carryList" class="carry-list"></ul>
+          <h3>Tagesfenster</h3>
+          <div id="dayCards" class="day-cards"></div>
+        </div>
       </section>
 
       <footer class="disclaimer">
         Hinweis: Diese Empfehlungen ersetzen keine medizinische Beratung. Im Zweifel
         bitte Kinderarzt oder Hebamme kontaktieren.
       </footer>
+
+      <aside class="card related-tools" aria-label="Passende Ratgeber">
+        <h2>Passende Ratgeber</h2>
+        <p><a href="../../baby-richtig-anziehen-temperatur/">Baby richtig anziehen bei jeder Temperatur</a></p>
+        <p><a href="../../baby-anziehen-nachts-temperatur/">Baby nachts richtig anziehen nach Temperatur</a></p>
+        <p><a href="../../windelbedarf-baby/">Windelbedarf im 1. Jahr</a></p>
+        <p><a href="../../windeln-pro-monat-baby/">Wie viele Windeln pro Monat braucht ein Baby?</a></p>
+      </aside>
     </main>
 
     <footer class="site-footer">

@@ -15,6 +15,18 @@
     if (pathname.indexOf('/impressum/') !== -1 || pathname.indexOf('/datenschutz/') !== -1) {
       return '';
     }
+    if (pathname.indexOf('/baby-richtig-anziehen-temperatur/') !== -1) {
+      return 'anziehen';
+    }
+    if (pathname.indexOf('/baby-anziehen-nachts-temperatur/') !== -1) {
+      return 'anziehen';
+    }
+    if (pathname.indexOf('/windelbedarf-baby/') !== -1) {
+      return 'windelbedarf';
+    }
+    if (pathname.indexOf('/windeln-pro-monat-baby/') !== -1) {
+      return 'windelbedarf';
+    }
     if (pathname.indexOf('/tools/babywetter/') !== -1) {
       return 'babywetter';
     }

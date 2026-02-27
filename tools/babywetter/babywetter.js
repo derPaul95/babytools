@@ -2,28 +2,33 @@
 const API_BASE = "https://api.open-meteo.com/v1/forecast";
 const GEO_API_BASE = "https://geocoding-api.open-meteo.com/v1/search";
 const GEO_REVERSE_API_BASE = "https://geocoding-api.open-meteo.com/v1/reverse";
+const DAY_WINDOWS = [
+  { key: "morning", label: "Morgens", startHour: 7, endHour: 9 },
+  { key: "midday", label: "Mittags", startHour: 12, endHour: 14 },
+  { key: "evening", label: "Abends", startHour: 18, endHour: 20 },
+];
 const FALLBACK_PLACES = [
   { name: "Berlin", country: "Deutschland", latitude: 52.52, longitude: 13.405 },
   { name: "Hamburg", country: "Deutschland", latitude: 53.5511, longitude: 9.9937 },
-  { name: "München", country: "Deutschland", latitude: 48.1371, longitude: 11.5754 },
-  { name: "Köln", country: "Deutschland", latitude: 50.9375, longitude: 6.9603 },
+  { name: "Muenchen", country: "Deutschland", latitude: 48.1371, longitude: 11.5754 },
+  { name: "Koeln", country: "Deutschland", latitude: 50.9375, longitude: 6.9603 },
   { name: "Frankfurt am Main", country: "Deutschland", latitude: 50.1109, longitude: 8.6821 },
   { name: "Offenbach am Main", country: "Deutschland", latitude: 50.0956, longitude: 8.7761 },
   { name: "Hanau", country: "Deutschland", latitude: 50.1264, longitude: 8.9283 },
   { name: "Stuttgart", country: "Deutschland", latitude: 48.7758, longitude: 9.1829 },
-  { name: "Düsseldorf", country: "Deutschland", latitude: 51.2277, longitude: 6.7735 },
+  { name: "Duesseldorf", country: "Deutschland", latitude: 51.2277, longitude: 6.7735 },
   { name: "Dortmund", country: "Deutschland", latitude: 51.5136, longitude: 7.4653 },
   { name: "Essen", country: "Deutschland", latitude: 51.4556, longitude: 7.0116 },
   { name: "Leipzig", country: "Deutschland", latitude: 51.3397, longitude: 12.3731 },
   { name: "Bremen", country: "Deutschland", latitude: 53.0793, longitude: 8.8017 },
   { name: "Dresden", country: "Deutschland", latitude: 51.0504, longitude: 13.7373 },
   { name: "Hannover", country: "Deutschland", latitude: 52.3759, longitude: 9.732 },
-  { name: "Nürnberg", country: "Deutschland", latitude: 49.4521, longitude: 11.0767 },
+  { name: "Nuernberg", country: "Deutschland", latitude: 49.4521, longitude: 11.0767 },
   { name: "Mannheim", country: "Deutschland", latitude: 49.4875, longitude: 8.466 },
   { name: "Freiburg im Breisgau", country: "Deutschland", latitude: 47.999, longitude: 7.8421 },
-  { name: "Saarbrücken", country: "Deutschland", latitude: 49.2402, longitude: 6.9969 },
+  { name: "Saarbruecken", country: "Deutschland", latitude: 49.2402, longitude: 6.9969 },
   { name: "Wien", country: "Oesterreich", latitude: 48.2082, longitude: 16.3738 },
-  { name: "Zürich", country: "Schweiz", latitude: 47.3769, longitude: 8.5417 },
+  { name: "Zuerich", country: "Schweiz", latitude: 47.3769, longitude: 8.5417 },
 ];
 
 const el = {
@@ -38,13 +43,20 @@ const el = {
   tempValue: document.getElementById("tempValue"),
   windValue: document.getElementById("windValue"),
   rainValue: document.getElementById("rainValue"),
+  dayRangeValue: document.getElementById("dayRangeValue"),
+  dayWindValue: document.getElementById("dayWindValue"),
+  dayRainValue: document.getElementById("dayRainValue"),
+  dayConditionValue: document.getElementById("dayConditionValue"),
   conditionSymbol: document.getElementById("conditionSymbol"),
   conditionValue: document.getElementById("conditionValue"),
   age: document.getElementById("age"),
   situation: document.getElementById("situation"),
+  mode: document.getElementById("mode"),
   choiceButtons: document.querySelectorAll(".choice-btn"),
   empty: document.getElementById("emptyState"),
-  result: document.getElementById("result"),
+  modeSwitch: document.getElementById("modeSwitch"),
+  nowResult: document.getElementById("result"),
+  dayResult: document.getElementById("dayResult"),
   outTemp: document.getElementById("outTemp"),
   outFeels: document.getElementById("outFeels"),
   topRecommendation: document.getElementById("topRecommendation"),
@@ -52,13 +64,18 @@ const el = {
   riskBadge: document.getElementById("riskBadge"),
   outfitList: document.getElementById("outfitList"),
   tipsList: document.getElementById("tipsList"),
+  carryList: document.getElementById("carryList"),
+  dayCards: document.getElementById("dayCards"),
 };
 
 let locationResultsCache = [];
 let weatherDataReady = false;
+let hourlyDataReady = false;
 let weatherData = null;
+let dayWindowData = [];
+let dayOverview = null;
 
-function setStatus(message, isError = false) {
+function setStatus(message, isError) {
   el.status.textContent = message;
   el.status.style.color = isError ? "#b91c1c" : "";
 }
@@ -68,19 +85,86 @@ function toNumber(input) {
   return Number.isFinite(n) ? n : null;
 }
 
+function average(values) {
+  if (!values.length) return null;
+  return values.reduce((acc, item) => acc + item, 0) / values.length;
+}
+
+function getMode() {
+  return el.mode ? el.mode.value : "now";
+}
+
+function updateRecommendState() {
+  const mode = getMode();
+  if (mode === "day") {
+    el.recommendBtn.disabled = !(weatherDataReady && hourlyDataReady);
+    return;
+  }
+  el.recommendBtn.disabled = !weatherDataReady;
+}
+
+function renderDayRange() {
+  if (!el.dayRangeValue || !el.dayWindValue || !el.dayRainValue || !el.dayConditionValue) return;
+  if (!dayOverview) {
+    el.dayRangeValue.textContent = "Tag: -- bis -- °C";
+    el.dayWindValue.textContent = "Tag: -- bis -- km/h";
+    el.dayRainValue.textContent = "Tag: -- bis -- mm/h";
+    el.dayConditionValue.textContent = "Tag: --";
+    return;
+  }
+  el.dayRangeValue.textContent =
+    "Tag: " + dayOverview.tempMin.toFixed(1) + " bis " + dayOverview.tempMax.toFixed(1) + " °C";
+  el.dayWindValue.textContent =
+    "Tag: " + dayOverview.windMin.toFixed(1) + " bis " + dayOverview.windMax.toFixed(1) + " km/h";
+  el.dayRainValue.textContent =
+    "Tag: " + dayOverview.rainMin.toFixed(1) + " bis " + dayOverview.rainMax.toFixed(1) + " mm/h";
+  el.dayConditionValue.textContent = "Tag: " + dayOverview.conditionText;
+}
+
 function setWeatherReadyState(isReady) {
   weatherDataReady = isReady;
-  el.recommendBtn.disabled = !isReady;
+  updateRecommendState();
+}
+
+function setHourlyReadyState(isReady) {
+  hourlyDataReady = isReady;
+  updateRecommendState();
+}
+
+function setMode(modeValue) {
+  if (!el.mode) return;
+  const allowed = modeValue === "day" ? "day" : "now";
+  el.mode.value = allowed;
+
+  el.choiceButtons.forEach((item) => {
+    if (item.dataset.target !== "mode") return;
+    const isActive = item.dataset.value === allowed;
+    item.classList.toggle("is-active", isActive);
+    item.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+
+  updateRecommendState();
+}
+
+function showResult(mode) {
+  el.empty.classList.add("hidden");
+  if (mode === "day") {
+    el.dayResult.classList.remove("hidden");
+    el.nowResult.classList.add("hidden");
+    return;
+  }
+  el.nowResult.classList.remove("hidden");
+  el.dayResult.classList.add("hidden");
 }
 
 function formatLocationName(item) {
-  if (item?.label) return item.label;
+  if (item && item.label) return item.label;
   const parts = [item.name, item.admin1, item.country].filter(Boolean);
   return parts.join(", ") || "Unbekannter Ort";
 }
 
 function formatCoordinates(lat, lon) {
-  return `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+  return lat.toFixed(2) + ", " + lon.toFixed(2);
 }
 
 function toRadians(value) {
@@ -113,8 +197,11 @@ function findNearestFallbackPlace(lat, lon) {
 
   if (!nearest) return null;
   return {
-    ...nearest,
-    label: `${nearest.name}, ${nearest.country}`,
+    name: nearest.name,
+    country: nearest.country,
+    latitude: nearest.latitude,
+    longitude: nearest.longitude,
+    label: nearest.name + ", " + nearest.country,
     distanceKm: minDistance,
   };
 }
@@ -123,26 +210,13 @@ function describeWeatherCode(code) {
   const c = Number(code);
 
   if (c === 0) return { label: "Sonnig/Klar", symbol: "☀️", type: "sunny" };
-  if (c === 1 || c === 2) return { label: "Leicht bewölkt", symbol: "⛅", type: "cloudy" };
+  if (c === 1 || c === 2) return { label: "Leicht bewoelkt", symbol: "⛅", type: "cloudy" };
   if (c === 3) return { label: "Bedeckt", symbol: "☁️", type: "cloudy" };
   if (c === 45 || c === 48) return { label: "Nebel", symbol: "🌫️", type: "fog" };
   if (
-    c === 51 ||
-    c === 53 ||
-    c === 55 ||
-    c === 56 ||
-    c === 57 ||
-    c === 61 ||
-    c === 63 ||
-    c === 65 ||
-    c === 66 ||
-    c === 67 ||
-    c === 80 ||
-    c === 81 ||
-    c === 82 ||
-    c === 95 ||
-    c === 96 ||
-    c === 99
+    c === 51 || c === 53 || c === 55 || c === 56 || c === 57 ||
+    c === 61 || c === 63 || c === 65 || c === 66 || c === 67 ||
+    c === 80 || c === 81 || c === 82 || c === 95 || c === 96 || c === 99
   ) {
     return { label: "Regen/Schauer", symbol: "🌧️", type: "rain" };
   }
@@ -153,7 +227,10 @@ function describeWeatherCode(code) {
   return { label: "Wetter gemischt", symbol: "🌤️", type: "mixed" };
 }
 
-// Sehr einfache Approximation: Wind kühlt, Regen ebenfalls leicht.
+function shouldPackRainGear(rainMm, rainProb) {
+  return rainMm >= 0.2 || rainProb >= 40 || rainMm > 0;
+}
+
 function calculateFeelsLike(temp, wind, rain) {
   const windPenalty = Math.min(wind * 0.07, 7);
   const rainPenalty = rain > 0 ? Math.min(rain * 0.6, 3) : 0;
@@ -161,7 +238,7 @@ function calculateFeelsLike(temp, wind, rain) {
 }
 
 function determineRisk(feelsLike) {
-  if (feelsLike < 5) return { key: "cold", label: "Kälte" };
+  if (feelsLike < 5) return { key: "cold", label: "Kaelte" };
   if (feelsLike > 27) return { key: "hot", label: "Hitze" };
   return { key: "normal", label: "Normal" };
 }
@@ -191,8 +268,8 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
     return [
       "Langarm-Body (hautnah)",
       "Warmer Midlayer (Wolle/Fleece)",
-      "Sehr warme Außenschicht (Winteroverall)",
-      "Mütze, Halstuch, Handschuhe, sehr warme Socken",
+      "Sehr warme Aussenschicht (Winteroverall)",
+      "Muetze, Halstuch, Handschuhe, sehr warme Socken",
     ];
   }
 
@@ -201,7 +278,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
       "Langarm-Body (hautnah)",
       "Warmer Midlayer (Wolle/Fleece)",
       "Warme Jacke oder Overall",
-      "Mütze und warme Socken",
+      "Muetze und warme Socken",
     ];
   }
 
@@ -210,7 +287,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
       "Langarm-Body",
       "Pullover oder Strickjacke",
       "Winddichte Jacke",
-      "Lange Hose und Mütze",
+      "Lange Hose und Muetze",
     ];
   }
 
@@ -226,7 +303,7 @@ function getNewbornLayerProfile(baseFeelsLike, situation) {
     return [
       "Kurz- oder Langarm-Body (je nach Wind)",
       "Leichte Hose",
-      "Optional dünne Schicht zum schnellen Anpassen",
+      "Optional duenne Schicht zum schnellen Anpassen",
     ];
   }
 
@@ -243,8 +320,8 @@ function getBabyLayerProfile(baseFeelsLike, situation) {
     return [
       "Langarm-Body",
       "Warmer Midlayer (Fleece/Strick)",
-      "Warme Außenschicht (Jacke/Overall)",
-      "Mütze und warme Socken",
+      "Warme Aussenschicht (Jacke/Overall)",
+      "Muetze und warme Socken",
     ];
   }
 
@@ -270,7 +347,7 @@ function getBabyLayerProfile(baseFeelsLike, situation) {
     return [
       "Kurz- oder Langarm-Body",
       "Leichte Hose",
-      "Optional dünne Zusatzschicht für Pausen",
+      "Optional duenne Zusatzschicht fuer Pausen",
     ];
   }
 
@@ -288,7 +365,7 @@ function getToddlerLayerProfile(baseFeelsLike, situation) {
       "Langarm-Shirt oder Body",
       "Warmer Midlayer",
       "Warme Jacke",
-      "Mütze und warme Socken",
+      "Muetze und warme Socken",
     ];
   }
 
@@ -311,8 +388,8 @@ function getToddlerLayerProfile(baseFeelsLike, situation) {
 
   if (toddlerIndex < 24) {
     return [
-      "Dünnes Shirt",
-      "Leichte Hose oder dünne Leggings",
+      "Duennes Shirt",
+      "Leichte Hose oder duenne Leggings",
       "Leichte Jacke nur bei Wind",
     ];
   }
@@ -329,27 +406,27 @@ function getOutfitByAge(age, feelsLike, situation) {
   return getToddlerLayerProfile(feelsLike, situation);
 }
 
-function getTips(risk, rain, wind, conditionType) {
+function getTips(risk, rain, wind, conditionType, rainProb) {
   const tips = [
     "Nacken- und Brust-Check: warm, aber nicht schwitzig.",
-    "Mehrere dünne Schichten sind besser als eine dicke.",
+    "Mehrere duenne Schichten sind besser als eine dicke.",
     "Ueberhitzung vermeiden, besonders im Kinderwagen mit Decke.",
   ];
 
-  if (rain > 0) {
-    tips.push("Regenschutz für Kinderwagen/Buggy und trockene Ersatzkleidung einplanen.");
+  if (shouldPackRainGear(rain, rainProb)) {
+    tips.push("Regenschutz fuer Kinderwagen/Buggy und trockene Ersatzkleidung einplanen.");
   }
 
   if (wind >= 20) {
-    tips.push("Bei starkem Wind zusätzlich winddichte Außenschicht nutzen.");
+    tips.push("Bei starkem Wind zusaetzlich winddichte Aussenschicht nutzen.");
   }
 
   if (risk.key === "cold") {
-    tips.push("Bei kälteren Bedingungen Hände, Füße und Kopf besonders gut schützen.");
+    tips.push("Bei kaelteren Bedingungen Haende, Fuesse und Kopf besonders gut schuetzen.");
   }
 
   if (risk.key === "hot") {
-    tips.push("Bei Hitze direkte Sonne meiden und auf regelmäßige Trinkpausen achten.");
+    tips.push("Bei Hitze direkte Sonne meiden und auf regelmaessige Trinkpausen achten.");
   }
 
   if (conditionType === "sunny") {
@@ -357,18 +434,18 @@ function getTips(risk, rain, wind, conditionType) {
   }
 
   if (conditionType === "fog") {
-    tips.push("Bei Nebel Sichtbarkeit erhöhen und Wege mit Verkehr meiden.");
+    tips.push("Bei Nebel Sichtbarkeit erhoehen und Wege mit Verkehr meiden.");
   }
 
   if (conditionType === "snow") {
-    tips.push("Bei Schnee auf trockene, warme Außenschicht und Fußwärme achten.");
+    tips.push("Bei Schnee auf trockene, warme Aussenschicht und Fusswaerme achten.");
   }
 
   return tips;
 }
 
-function renderLayerItems(items) {
-  el.outfitList.innerHTML = "";
+function renderLayerItems(target, items) {
+  target.innerHTML = "";
   items.forEach((item, index) => {
     const li = document.createElement("li");
     li.className = "layer-item";
@@ -383,17 +460,17 @@ function renderLayerItems(items) {
 
     li.appendChild(step);
     li.appendChild(text);
-    el.outfitList.appendChild(li);
+    target.appendChild(li);
   });
 }
 
-function renderTipChips(items) {
-  el.tipsList.innerHTML = "";
+function renderTipChips(target, items) {
+  target.innerHTML = "";
   items.forEach((item) => {
     const chip = document.createElement("span");
     chip.className = "tip-chip";
     chip.textContent = item;
-    el.tipsList.appendChild(chip);
+    target.appendChild(chip);
   });
 }
 
@@ -403,43 +480,58 @@ function getRiskVisual(riskKey) {
   return "✅";
 }
 
-function addSituationOutfitItems(outfit, situation, age, feelsLike, wind, rain) {
+function addSituationOutfitItems(outfit, situation, age, feelsLike, wind, rain, rainProb) {
   if (situation === "stroller") {
     outfit.push("Kinderwagen-Windschutz/Abdeckung bereithalten.");
     if (feelsLike < 14) {
-      outfit.push("Kinderwagen-Decke oder Fußsack als Zusatzwärme einplanen.");
+      outfit.push("Kinderwagen-Decke oder Fusssack als Zusatzwaerme einplanen.");
     }
-    if (rain > 0) {
-      outfit.push("Regenschutz für den Kinderwagen mitnehmen.");
+    if (shouldPackRainGear(rain, rainProb)) {
+      outfit.push("Regenschutz fuer den Kinderwagen mitnehmen.");
     }
     return;
   }
 
   if (situation === "carrier") {
-    outfit.push("In der Trage lieber dünn schichten und dicke Overalls vermeiden.");
+    outfit.push("In der Trage lieber duenn schichten und dicke Overalls vermeiden.");
     outfit.push("Nacken und Atembereich in der Trage frei halten.");
     if (age === "newborn" || feelsLike < 10) {
-      outfit.push("Füße und Beine in der Trage zusätzlich warm halten.");
+      outfit.push("Fuesse und Beine in der Trage zusaetzlich warm halten.");
     }
     return;
   }
 
-  // Normal draussen (aktiv)
   if (wind >= 15) {
-    outfit.push("Leichte winddichte Schicht für aktive Abschnitte bereithalten.");
+    outfit.push("Leichte winddichte Schicht fuer aktive Abschnitte bereithalten.");
   }
 }
 
 function getOutfitDedupKey(item) {
   const text = item.toLowerCase();
-  if (text.includes("regenschutz")) return "regenschutz";
-  if (text.includes("windschutz") || text.includes("winddichte")) return "windschutz";
-  if (text.includes("body")) return "body";
-  if (text.includes("midlayer") || text.includes("strickjacke") || text.includes("pullover") || text.includes("hoodie")) return "midlayer";
-  if (text.includes("jacke") || text.includes("overall") || text.includes("außenschicht")) return "outer";
-  if (text.includes("mütze") || text.includes("kopfschutz") || text.includes("sonnenhut")) return "head";
-  if (text.includes("socken") || text.includes("füße") || text.includes("beine")) return "feet";
-  if (text.includes("extraschicht") || text.includes("zusatzschicht")) return "extra-layer";
+  if (text.indexOf("regenschutz") !== -1) return "regenschutz";
+  if (text.indexOf("windschutz") !== -1 || text.indexOf("winddichte") !== -1) return "windschutz";
+  if (text.indexOf("body") !== -1) return "body";
+  if (
+    text.indexOf("midlayer") !== -1 ||
+    text.indexOf("strickjacke") !== -1 ||
+    text.indexOf("pullover") !== -1 ||
+    text.indexOf("hoodie") !== -1
+  ) return "midlayer";
+  if (
+    text.indexOf("jacke") !== -1 ||
+    text.indexOf("overall") !== -1 ||
+    text.indexOf("aussenschicht") !== -1
+  ) return "outer";
+  if (
+    text.indexOf("muetze") !== -1 ||
+    text.indexOf("kopfschutz") !== -1 ||
+    text.indexOf("sonnenhut") !== -1
+  ) return "head";
+  if (
+    text.indexOf("socken") !== -1 ||
+    text.indexOf("fuesse") !== -1 ||
+    text.indexOf("beine") !== -1
+  ) return "feet";
 
   return text.replace(/[^a-z0-9]+/g, " ").trim();
 }
@@ -459,106 +551,90 @@ function dedupeOutfitItems(items) {
   return result;
 }
 
-function getRecommendationAdjustment(feelsLike, wind, rain) {
+function getRecommendationAdjustment(feelsLike, wind, rain, rainProb) {
   let adjustment = 0;
 
   if (wind >= 20) adjustment += 2.0;
   else if (wind >= 12) adjustment += 1.0;
 
   if (rain > 0.6) adjustment += 2.0;
-  else if (rain > 0) adjustment += 1.0;
+  else if (rain > 0 || rainProb >= 40) adjustment += 1.0;
 
-  // Bei milden, trockenen Bedingungen etwas sanfter einstufen.
-  if (rain === 0 && wind < 10 && feelsLike >= 17 && feelsLike <= 23) {
+  if (rain === 0 && rainProb < 40 && wind < 10 && feelsLike >= 17 && feelsLike <= 23) {
     adjustment -= 0.8;
   }
 
   return adjustment;
 }
 
-function applySafetyLayerRules(outfit, feelsLike, wind, rain) {
+function applySafetyLayerRules(outfit, feelsLike, wind, rain, rainProb) {
   const normalized = outfit.map((item) => item.toLowerCase());
-  const hasBody = normalized.some((item) => item.includes("body"));
+  const hasBody = normalized.some((item) => item.indexOf("body") !== -1);
   const hasMidlayer = normalized.some(
     (item) =>
-      item.includes("midlayer") ||
-      item.includes("strickjacke") ||
-      item.includes("pullover") ||
-      item.includes("hoodie")
+      item.indexOf("midlayer") !== -1 ||
+      item.indexOf("strickjacke") !== -1 ||
+      item.indexOf("pullover") !== -1 ||
+      item.indexOf("hoodie") !== -1
   );
   const hasOuter = normalized.some(
     (item) =>
-      item.includes("jacke") ||
-      item.includes("overall") ||
-      item.includes("außenschicht") ||
-      item.includes("winddicht")
+      item.indexOf("jacke") !== -1 ||
+      item.indexOf("overall") !== -1 ||
+      item.indexOf("aussenschicht") !== -1 ||
+      item.indexOf("winddicht") !== -1
   );
 
   if (feelsLike < 12) {
-    if (!hasBody) {
-      outfit.unshift("Body als Basis-Schicht.");
-    }
-    if (!hasMidlayer) {
-      outfit.push("Zusätzlicher Midlayer (z. B. Strickjacke/Fleece) einplanen.");
-    }
-    if (!hasOuter) {
-      outfit.push("Wind- und wetterfeste Außenschicht (Jacke/Overall) anziehen.");
-    }
+    if (!hasBody) outfit.unshift("Body als Basis-Schicht.");
+    if (!hasMidlayer) outfit.push("Zusaetzlicher Midlayer (z. B. Strickjacke/Fleece) einplanen.");
+    if (!hasOuter) outfit.push("Wind- und wetterfeste Aussenschicht (Jacke/Overall) anziehen.");
   }
 
-  if (rain > 0 || wind >= 15) {
-    outfit.push("Bei Regen/Wind eine zusätzliche Schicht einplanen.");
+  if (shouldPackRainGear(rain, rainProb) || wind >= 15) {
+    outfit.push("Bei Regen/Wind eine zusaetzliche Schicht einplanen.");
   }
 }
 
-function renderRecommendation({ temp, wind, rain, age, situation }) {
-  const feelsLike = calculateFeelsLike(temp, wind, rain);
-  const recommendationAdjustment = getRecommendationAdjustment(feelsLike, wind, rain);
+function buildOutfitPlan(input) {
+  const feelsLike = calculateFeelsLike(input.temp, input.wind, input.rain);
+  const recommendationAdjustment = getRecommendationAdjustment(feelsLike, input.wind, input.rain, input.rainProb);
   const recommendationIndex = feelsLike - recommendationAdjustment;
   const risk = determineRisk(feelsLike);
-  const outfit = getOutfitByAge(age, recommendationIndex, situation);
-  const weatherInfo = describeWeatherCode(weatherData?.weatherCode);
-  const tips = getTips(risk, rain, wind, weatherInfo.type);
+  const outfit = getOutfitByAge(input.age, recommendationIndex, input.situation);
+  const tips = getTips(risk, input.rain, input.wind, input.conditionType, input.rainProb);
 
-  addSituationOutfitItems(outfit, situation, age, recommendationIndex, wind, rain);
-  applySafetyLayerRules(outfit, recommendationIndex, wind, rain);
+  addSituationOutfitItems(outfit, input.situation, input.age, recommendationIndex, input.wind, input.rain, input.rainProb);
+  applySafetyLayerRules(outfit, recommendationIndex, input.wind, input.rain, input.rainProb);
 
   if (recommendationAdjustment >= 1.5) {
-    tips.push("Wind/Nässe berücksichtigt: Empfehlung fällt bewusst etwas wärmer aus.");
+    tips.push("Wind/Naesse beruecksichtigt: Empfehlung faellt bewusst etwas waermer aus.");
   }
 
-  if (age === "newborn") {
-    if (situation === "stroller") {
-      tips.push("Neugeboren im Kinderwagen: Temperatur häufiger prüfen (Nacken-Check).");
-    } else if (situation === "carrier") {
-      tips.push("Neugeboren in der Trage: Hitzestau zwischen Körpern vermeiden.");
+  if (input.age === "newborn") {
+    if (input.situation === "stroller") {
+      tips.push("Neugeboren im Kinderwagen: Temperatur haeufiger pruefen (Nacken-Check).");
+    } else if (input.situation === "carrier") {
+      tips.push("Neugeboren in der Trage: Hitzestau zwischen Koerpern vermeiden.");
     }
-  } else if (age === "baby" && situation === "carrier") {
-    tips.push("Bei Babys in der Trage auf Wärmestau achten und Schichten flexibel halten.");
-  } else if (age === "toddler" && situation === "active") {
-    tips.push("Aktive Kleinkinder wärmen schnell auf: Schichten unterwegs leicht reduzierbar halten.");
+  } else if (input.age === "baby" && input.situation === "carrier") {
+    tips.push("Bei Babys in der Trage auf Waermestau achten und Schichten flexibel halten.");
+  } else if (input.age === "toddler" && input.situation === "active") {
+    tips.push("Aktive Kleinkinder waermen schnell auf: Schichten unterwegs leicht reduzierbar halten.");
   }
 
-  if (rain > 0) {
+  if (shouldPackRainGear(input.rain, input.rainProb)) {
     outfit.push("Regenschutz (z. B. Regenhaube/Abdeckung) mitnehmen.");
   }
 
-  outfit.push("Optional zusätzlich: eine dünne Extraschicht (z. B. Cardigan/Weste) mitnehmen.");
+  outfit.push("Optional zusaetzlich: eine duenne Extraschicht (z. B. Cardigan/Weste) mitnehmen.");
 
-  const cleanedOutfit = dedupeOutfitItems(outfit);
-
-  el.outTemp.textContent = temp.toFixed(1);
-  el.outFeels.textContent = feelsLike.toFixed(1);
-  el.topRecommendation.textContent = `Heute: ${cleanedOutfit.length} Layer empfohlen, angepasst auf Wetter und Situation.`;
-  el.riskIcon.textContent = getRiskVisual(risk.key);
-  el.riskBadge.textContent = risk.label;
-  el.riskBadge.className = `badge ${risk.key}`;
-
-  renderLayerItems(cleanedOutfit);
-  renderTipChips(tips);
-
-  el.empty.classList.add("hidden");
-  el.result.classList.remove("hidden");
+  return {
+    feelsLike: feelsLike,
+    risk: risk,
+    outfit: dedupeOutfitItems(outfit),
+    tips: tips,
+  };
 }
 
 function readFormValues() {
@@ -566,21 +642,264 @@ function readFormValues() {
     throw new Error("Bitte zuerst Standort freigeben oder einen Ort suchen.");
   }
 
-  const temp = weatherData?.temp ?? null;
-  const wind = weatherData?.wind ?? null;
-  const rain = weatherData?.rain ?? null;
+  const temp = weatherData ? weatherData.temp : null;
+  const wind = weatherData ? weatherData.wind : null;
+  const rain = weatherData ? weatherData.rain : null;
   const age = el.age.value;
   const situation = el.situation.value;
 
   if (temp === null || wind === null || rain === null) {
-    throw new Error("Wetterdaten sind unvollständig. Bitte erneut laden.");
+    throw new Error("Wetterdaten sind unvollstaendig. Bitte erneut laden.");
   }
 
-  if (rain < 0 || wind < 0) {
-    throw new Error("Wind und Regen dürfen nicht negativ sein.");
+  return { temp: temp, wind: wind, rain: rain, age: age, situation: situation };
+}
+
+function renderNowRecommendation(values) {
+  const weatherInfo = describeWeatherCode(weatherData ? weatherData.weatherCode : null);
+  const plan = buildOutfitPlan({
+    temp: values.temp,
+    wind: values.wind,
+    rain: values.rain,
+    rainProb: values.rain > 0 ? 100 : 0,
+    age: values.age,
+    situation: values.situation,
+    conditionType: weatherInfo.type,
+  });
+
+  el.outTemp.textContent = values.temp.toFixed(1);
+  el.outFeels.textContent = plan.feelsLike.toFixed(1);
+  el.topRecommendation.textContent = "Heute: " + plan.outfit.length + " Layer empfohlen, angepasst auf Wetter und Situation.";
+  el.riskIcon.textContent = getRiskVisual(plan.risk.key);
+  el.riskBadge.textContent = plan.risk.label;
+  el.riskBadge.className = "badge " + plan.risk.key;
+
+  renderLayerItems(el.outfitList, plan.outfit);
+  renderTipChips(el.tipsList, plan.tips);
+  showResult("now");
+}
+
+function getBerlinTodayKey() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const year = parts.find((item) => item.type === "year").value;
+  const month = parts.find((item) => item.type === "month").value;
+  const day = parts.find((item) => item.type === "day").value;
+  return year + "-" + month + "-" + day;
+}
+
+function buildHourlyPoints(hourly) {
+  const points = [];
+  for (let i = 0; i < hourly.time.length; i += 1) {
+    const temp = toNumber(hourly.temperature_2m[i]);
+    const wind = toNumber(hourly.wind_speed_10m[i]);
+    const rainProb = toNumber(hourly.precipitation_probability[i]);
+    const rain = toNumber(hourly.precipitation[i]);
+    const weatherCode = toNumber(hourly.weather_code && hourly.weather_code[i]);
+    const timeValue = hourly.time[i];
+    if (temp === null || wind === null || rainProb === null || rain === null || !timeValue) continue;
+
+    const hour = Number(timeValue.slice(11, 13));
+    points.push({
+      time: timeValue,
+      dateKey: timeValue.slice(0, 10),
+      hour: Number.isFinite(hour) ? hour : -1,
+      temp: temp,
+      wind: wind,
+      rainProb: rainProb,
+      rain: rain,
+      weatherCode: weatherCode,
+    });
+  }
+  return points;
+}
+
+function buildDayOverview(hourly) {
+  const points = buildHourlyPoints(hourly);
+  if (!points.length) return null;
+  const preferredDateKey = getBerlinTodayKey();
+  const dateKeys = Array.from(new Set(points.map((item) => item.dateKey))).sort();
+  if (!dateKeys.length) return null;
+  const selectedDateKey = dateKeys.find((item) => item >= preferredDateKey) || dateKeys[0];
+  const selected = points.filter((item) => item.dateKey === selectedDateKey);
+  if (!selected.length) return null;
+
+  const conditionLabels = Array.from(
+    new Set(
+      selected
+        .map((item) => describeWeatherCode(item.weatherCode).label)
+        .filter(Boolean)
+    )
+  );
+  let conditionText = "--";
+  if (conditionLabels.length === 1) {
+    conditionText = conditionLabels[0];
+  } else if (conditionLabels.length > 1) {
+    conditionText = conditionLabels[0] + " bis " + conditionLabels[conditionLabels.length - 1];
   }
 
-  return { temp, wind, rain, age, situation };
+  return {
+    tempMin: Math.min.apply(null, selected.map((item) => item.temp)),
+    tempMax: Math.max.apply(null, selected.map((item) => item.temp)),
+    windMin: Math.min.apply(null, selected.map((item) => item.wind)),
+    windMax: Math.max.apply(null, selected.map((item) => item.wind)),
+    rainMin: Math.min.apply(null, selected.map((item) => item.rain)),
+    rainMax: Math.max.apply(null, selected.map((item) => item.rain)),
+    conditionText: conditionText,
+  };
+}
+
+function selectWindowPoints(points, windowConfig, preferredDateKey) {
+  const inWindow = points.filter((item) => item.hour >= windowConfig.startHour && item.hour <= windowConfig.endHour);
+
+  const todayMatches = inWindow.filter((item) => item.dateKey === preferredDateKey);
+  if (todayMatches.length) return todayMatches;
+
+  const keys = Array.from(new Set(inWindow.map((item) => item.dateKey))).sort();
+  if (!keys.length) return [];
+
+  const nextKey = keys.find((item) => item >= preferredDateKey) || keys[0];
+  return inWindow.filter((item) => item.dateKey === nextKey);
+}
+
+function aggregateWindow(windowLabel, points) {
+  if (!points.length) {
+    return {
+      label: windowLabel,
+      hasData: false,
+    };
+  }
+
+  const tempAvg = average(points.map((item) => item.temp));
+  const windMax = Math.max.apply(null, points.map((item) => item.wind));
+  const rainProbMax = Math.max.apply(null, points.map((item) => item.rainProb));
+  const rainMmMax = Math.max.apply(null, points.map((item) => item.rain));
+  const feelAvg = average(points.map((item) => calculateFeelsLike(item.temp, item.wind, item.rain)));
+  const risk = determineRisk(feelAvg);
+
+  return {
+    label: windowLabel,
+    hasData: true,
+    tempAvg: tempAvg,
+    windMax: windMax,
+    rainProbMax: rainProbMax,
+    rainMmMax: rainMmMax,
+    feelAvg: feelAvg,
+    risk: risk,
+  };
+}
+
+function buildDayWindows(hourly) {
+  const points = buildHourlyPoints(hourly);
+  const preferredDateKey = getBerlinTodayKey();
+
+  return DAY_WINDOWS.map((windowConfig) => {
+    const selected = selectWindowPoints(points, windowConfig, preferredDateKey);
+    return aggregateWindow(windowConfig.label, selected);
+  });
+}
+
+function buildCarryItems(windowItems) {
+  const valid = windowItems.filter((item) => item.hasData);
+  if (!valid.length) return ["Keine zusaetzlichen Mitnahmehinweise verfuegbar."];
+
+  const items = [];
+  const hasRain = valid.some((item) => item.rainProbMax >= 40 || item.rainMmMax >= 0.2);
+  const hasWind = valid.some((item) => item.windMax >= 25);
+  const temps = valid.map((item) => item.tempAvg);
+  const tempSpread = Math.max.apply(null, temps) - Math.min.apply(null, temps);
+
+  if (hasRain) items.push("Regenverdeck/Regenschutz einpacken");
+  if (hasWind) items.push("Windschutz oder winddichte Schicht mitnehmen");
+  if (tempSpread >= 6) items.push("Zwiebellook: 1 Layer zum Ausziehen einplanen");
+  if (!items.length) items.push("Keine besonderen Extras noetig, Standardschicht reicht meist aus.");
+
+  return items;
+}
+
+function renderCarryItems(items) {
+  el.carryList.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    el.carryList.appendChild(li);
+  });
+}
+
+function renderDayCards(items, age, situation) {
+  el.dayCards.innerHTML = "";
+
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "day-card";
+
+    const title = document.createElement("h4");
+    title.textContent = item.label;
+    card.appendChild(title);
+
+    if (!item.hasData) {
+      const empty = document.createElement("p");
+      empty.className = "day-empty";
+      empty.textContent = "Keine Daten";
+      card.appendChild(empty);
+      el.dayCards.appendChild(card);
+      return;
+    }
+
+    const metrics = document.createElement("div");
+    metrics.className = "day-metrics";
+    metrics.innerHTML =
+      "<p><strong>Temp Ø:</strong> " + item.tempAvg.toFixed(1) + " °C</p>" +
+      "<p><strong>Gefuehlt Ø:</strong> " + item.feelAvg.toFixed(1) + " °C</p>" +
+      "<p><strong>Risiko:</strong> " + item.risk.label + "</p>" +
+      "<p><strong>Wind max:</strong> " + item.windMax.toFixed(1) + " km/h</p>" +
+      "<p><strong>Regenchance max:</strong> " + Math.round(item.rainProbMax) + " %</p>";
+    card.appendChild(metrics);
+
+    const plan = buildOutfitPlan({
+      temp: item.tempAvg,
+      wind: item.windMax,
+      rain: item.rainMmMax,
+      rainProb: item.rainProbMax,
+      age: age,
+      situation: situation,
+      conditionType: shouldPackRainGear(item.rainMmMax, item.rainProbMax) ? "rain" : "mixed",
+    });
+
+    const outfitTitle = document.createElement("p");
+    outfitTitle.className = "day-subtitle";
+    outfitTitle.textContent = "Outfit";
+    card.appendChild(outfitTitle);
+
+    const outfitList = document.createElement("ol");
+    outfitList.className = "layer-list compact";
+    renderLayerItems(outfitList, plan.outfit);
+    card.appendChild(outfitList);
+
+    const carry = document.createElement("p");
+    carry.className = "day-hint";
+    carry.textContent = shouldPackRainGear(item.rainMmMax, item.rainProbMax)
+      ? "Mitnehmen: Regenschutz einplanen."
+      : "Mitnehmen: Optional duenne Zusatzschicht.";
+    card.appendChild(carry);
+
+    el.dayCards.appendChild(card);
+  });
+}
+
+function renderDayRecommendation(values) {
+  const valid = dayWindowData.filter((item) => item.hasData);
+  if (!valid.length) {
+    throw new Error("Fuer den Tagesverlauf sind keine passenden Stunden verfuegbar.");
+  }
+  renderCarryItems(buildCarryItems(dayWindowData));
+  renderDayCards(dayWindowData, values.age, values.situation);
+  showResult("day");
 }
 
 async function fetchWeather(lat, lon) {
@@ -592,19 +911,13 @@ async function fetchWeather(lat, lon) {
     timezone: "Europe/Berlin",
   });
 
-  const url = `${API_BASE}?${params.toString()}`;
+  const url = API_BASE + "?" + params.toString();
   const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Open-Meteo Fehler: HTTP ${response.status}`);
-  }
+  if (!response.ok) throw new Error("Open-Meteo Fehler: HTTP " + response.status);
 
   const data = await response.json();
-  const current = data?.current;
-
-  if (!current) {
-    throw new Error("Open-Meteo Antwort unvollständig.");
-  }
+  const current = data && data.current;
+  if (!current) throw new Error("Open-Meteo Antwort unvollstaendig.");
 
   const temp = toNumber(current.temperature_2m);
   const wind = toNumber(current.wind_speed_10m);
@@ -615,7 +928,34 @@ async function fetchWeather(lat, lon) {
     throw new Error("Wetterdaten konnten nicht gelesen werden.");
   }
 
-  return { temp, wind, rain, weatherCode };
+  return { temp: temp, wind: wind, rain: rain, weatherCode: weatherCode };
+}
+
+async function fetchHourlyWeather(lat, lon) {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    hourly: "temperature_2m,wind_speed_10m,precipitation_probability,precipitation,weather_code",
+    wind_speed_unit: "kmh",
+    timezone: "Europe/Berlin",
+  });
+
+  const url = API_BASE + "?" + params.toString();
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Hourly-API Fehler: HTTP " + response.status);
+
+  const data = await response.json();
+  const hourly = data && data.hourly;
+  if (!hourly) throw new Error("Hourly-Daten unvollstaendig.");
+
+  const required = ["time", "temperature_2m", "wind_speed_10m", "precipitation_probability", "precipitation", "weather_code"];
+  required.forEach((key) => {
+    if (!Array.isArray(hourly[key])) {
+      throw new Error("Hourly-Feld fehlt: " + key);
+    }
+  });
+
+  return hourly;
 }
 
 async function fetchLocations(query) {
@@ -626,15 +966,15 @@ async function fetchLocations(query) {
     format: "json",
   });
 
-  const url = `${GEO_API_BASE}?${params.toString()}`;
+  const url = GEO_API_BASE + "?" + params.toString();
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Ortsuche Fehler: HTTP ${response.status}`);
+    throw new Error("Ortsuche Fehler: HTTP " + response.status);
   }
 
   const data = await response.json();
-  const results = data?.results;
+  const results = data && data.results;
 
   if (!Array.isArray(results) || results.length === 0) {
     throw new Error("Kein passender Ort gefunden.");
@@ -652,23 +992,23 @@ async function fetchReverseLocation(lat, lon) {
 
   for (const paramsObj of attempts) {
     const params = new URLSearchParams(paramsObj);
-    const url = `${GEO_REVERSE_API_BASE}?${params.toString()}`;
+    const url = GEO_REVERSE_API_BASE + "?" + params.toString();
     const response = await fetch(url);
     if (!response.ok) continue;
 
     const data = await response.json();
-    const results = Array.isArray(data?.results) ? data.results : [];
-    const named = results.find((item) => Boolean(item?.name));
+    const results = Array.isArray(data && data.results) ? data.results : [];
+    const named = results.find((item) => Boolean(item && item.name));
     if (named) return named;
   }
 
-  throw new Error("Ort für Standort konnte nicht ermittelt werden.");
+  throw new Error("Ort fuer Standort konnte nicht ermittelt werden.");
 }
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Geolocation wird von diesem Browser nicht unterstützt."));
+      reject(new Error("Geolocation wird von diesem Browser nicht unterstuetzt."));
       return;
     }
 
@@ -689,9 +1029,9 @@ function applyWeatherToForm(weather) {
     rain: weather.rain,
     weatherCode: weather.weatherCode,
   };
-  el.tempValue.textContent = `${weather.temp.toFixed(1)} °C`;
-  el.windValue.textContent = `${weather.wind.toFixed(1)} km/h`;
-  el.rainValue.textContent = `${weather.rain.toFixed(1)} mm/h`;
+  el.tempValue.textContent = weather.temp.toFixed(1) + " °C";
+  el.windValue.textContent = weather.wind.toFixed(1) + " km/h";
+  el.rainValue.textContent = weather.rain.toFixed(1) + " mm/h";
   el.conditionSymbol.textContent = weatherInfo.symbol;
   el.conditionValue.textContent = weatherInfo.label;
   setWeatherReadyState(true);
@@ -704,7 +1044,7 @@ function renderLocationResults(results) {
   results.forEach((item, index) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `result-btn${index === 0 ? " is-active" : ""}`;
+    button.className = "result-btn" + (index === 0 ? " is-active" : "");
     button.dataset.index = String(index);
     button.setAttribute("aria-selected", index === 0 ? "true" : "false");
     button.textContent = formatLocationName(item);
@@ -728,13 +1068,33 @@ async function loadWeatherForLocation(location, sourceText) {
   const lon = toNumber(location.longitude);
 
   if (lat === null || lon === null) {
-    throw new Error("Ungültige Koordinaten für den Ort.");
+    throw new Error("Ungueltige Koordinaten fuer den Ort.");
   }
 
   setStatus("Wetter wird geladen...");
+
   const weather = await fetchWeather(lat, lon);
   applyWeatherToForm(weather);
-  setStatus(`Wetterdaten übernommen (${sourceText}).`);
+
+  let extraStatus = "";
+  try {
+    const hourly = await fetchHourlyWeather(lat, lon);
+    dayWindowData = buildDayWindows(hourly);
+    dayOverview = buildDayOverview(hourly);
+    renderDayRange();
+    setHourlyReadyState(true);
+  } catch (error) {
+    dayWindowData = [];
+    dayOverview = null;
+    renderDayRange();
+    setHourlyReadyState(false);
+    if (getMode() === "day") {
+      setMode("now");
+    }
+    extraStatus = " Tagesverlauf nicht verfuegbar: " + error.message;
+  }
+
+  setStatus("Wetterdaten uebernommen (" + sourceText + ")." + extraStatus, Boolean(extraStatus));
 }
 
 async function handleGeoClick() {
@@ -743,30 +1103,33 @@ async function handleGeoClick() {
 
   try {
     const pos = await getCurrentPosition();
-    const { latitude, longitude } = pos.coords;
+    const latitude = pos.coords.latitude;
+    const longitude = pos.coords.longitude;
     let currentLocation = {
-      latitude,
-      longitude,
-      label: `Aktueller Standort (${formatCoordinates(latitude, longitude)})`,
+      latitude: latitude,
+      longitude: longitude,
+      label: "Aktueller Standort (" + formatCoordinates(latitude, longitude) + ")",
     };
 
     try {
       const reverse = await fetchReverseLocation(latitude, longitude);
-      const reverseName = formatLocationName(reverse);
       currentLocation = {
-        ...reverse,
-        latitude,
-        longitude,
-        label: reverseName,
+        latitude: latitude,
+        longitude: longitude,
+        name: reverse.name,
+        admin1: reverse.admin1,
+        country: reverse.country,
+        label: formatLocationName(reverse),
       };
     } catch (_error) {
       const nearest = findNearestFallbackPlace(latitude, longitude);
       if (nearest) {
         currentLocation = {
-          ...nearest,
-          latitude,
-          longitude,
-          label: `Nächster Ort: ${nearest.label}`,
+          latitude: latitude,
+          longitude: longitude,
+          name: nearest.name,
+          country: nearest.country,
+          label: "Naechster Ort: " + nearest.label,
         };
       }
     }
@@ -775,7 +1138,7 @@ async function handleGeoClick() {
     await loadWeatherForLocation(currentLocation, formatLocationName(currentLocation));
   } catch (error) {
     setStatus(
-      `Standort/Wetter nicht verfügbar: ${error.message}. Nutze die Ortssuche oder versuche es erneut.`,
+      "Standort/Wetter nicht verfuegbar: " + error.message + ". Nutze die Ortssuche oder versuche es erneut.",
       true
     );
   } finally {
@@ -787,7 +1150,7 @@ async function handleLocationSearch() {
   const query = el.locationQuery.value.trim();
 
   if (query.length < 2) {
-    setStatus("Bitte mindestens 2 Zeichen für die Ortssuche eingeben.", true);
+    setStatus("Bitte mindestens 2 Zeichen fuer die Ortssuche eingeben.", true);
     return;
   }
 
@@ -797,10 +1160,9 @@ async function handleLocationSearch() {
   try {
     const results = await fetchLocations(query);
     renderLocationResults(results);
-    const firstLocation = results[0];
-    await loadWeatherForLocation(firstLocation, formatLocationName(firstLocation));
+    await loadWeatherForLocation(results[0], formatLocationName(results[0]));
   } catch (error) {
-    setStatus(`Ortsuche fehlgeschlagen: ${error.message}`, true);
+    setStatus("Ortsuche fehlgeschlagen: " + error.message, true);
     el.resultsLabel.classList.add("hidden");
     locationResultsCache = [];
   } finally {
@@ -812,7 +1174,7 @@ async function handleLocationPick(selectedIndex) {
   const item = locationResultsCache[selectedIndex];
 
   if (!item) {
-    setStatus("Ausgewählter Ort konnte nicht gelesen werden.", true);
+    setStatus("Ausgewaehlter Ort konnte nicht gelesen werden.", true);
     return;
   }
 
@@ -820,7 +1182,7 @@ async function handleLocationPick(selectedIndex) {
     setActiveLocationResult(selectedIndex);
     await loadWeatherForLocation(item, formatLocationName(item));
   } catch (error) {
-    setStatus(`Wetterabruf fehlgeschlagen: ${error.message}`, true);
+    setStatus("Wetterabruf fehlgeschlagen: " + error.message, true);
   }
 }
 
@@ -841,6 +1203,13 @@ function handleChoicePick(event) {
     item.classList.toggle("is-active", isActive);
     item.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
+
+  if (target === "mode") {
+    setMode(value);
+    if (el.empty.classList.contains("hidden")) {
+      handleFormSubmit(event);
+    }
+  }
 }
 
 function handleLocationResultsClick(event) {
@@ -856,19 +1225,37 @@ function handleFormSubmit(event) {
 
   try {
     const values = readFormValues();
-    renderRecommendation(values);
+    if (getMode() === "day") {
+      if (!hourlyDataReady) {
+        setMode("now");
+        renderNowRecommendation(values);
+        setStatus("Tagesverlauf nicht verfuegbar. Auf 'Jetzt' umgestellt.", true);
+        return;
+      }
+      renderDayRecommendation(values);
+      setStatus("Tagesempfehlung aktualisiert.");
+      return;
+    }
+
+    renderNowRecommendation(values);
     setStatus("Empfehlung aktualisiert.");
   } catch (error) {
     setStatus(error.message, true);
   }
 }
 
+setMode("now");
 setWeatherReadyState(false);
+setHourlyReadyState(false);
+renderDayRange();
 setStatus("Bitte Standort verwenden oder einen Ort suchen, um Wetterdaten zu laden.");
 
 el.geoBtn.addEventListener("click", handleGeoClick);
 el.searchBtn.addEventListener("click", handleLocationSearch);
 el.form.addEventListener("click", handleChoicePick);
+if (el.modeSwitch) {
+  el.modeSwitch.addEventListener("click", handleChoicePick);
+}
 el.locationResults.addEventListener("click", handleLocationResultsClick);
 el.form.addEventListener("submit", handleFormSubmit);
 })();

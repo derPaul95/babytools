@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BabyTools</title>
+    <title>BabyTools: Tools & Ratgeber für Eltern</title>
     <meta
       name="description"
-      content="BabyTools bietet einfache Helfer für Familien. Starte mit BabyWetter für eine schnelle Outfit-Empfehlung."
+      content="BabyTools bietet praktische Tools und Ratgeber fuer Eltern: Babywetter, Windel-Rechner, Kleidung nach Temperatur und Windelbedarf im 1. Jahr."
     />
     <link rel="stylesheet" href="./assets/css/main.css" />
   </head>
@@ -16,6 +16,8 @@
         <a class="brand" href="./index.html">BabyTools</a>
         <nav class="site-nav" aria-label="Hauptnavigation">
           <a data-nav="home" href="./index.html">Home</a>
+          <a data-nav="anziehen" href="./baby-richtig-anziehen-temperatur/">Baby richtig anziehen</a>
+          <a data-nav="windelbedarf" href="./windelbedarf-baby/">Windelbedarf im 1. Jahr</a>
           <a data-nav="babywetter" href="./tools/babywetter/">BabyWetter</a>
           <a data-nav="windelrechner" href="./tools/windelrechner/">Windel-Rechner</a>
         </nav>
@@ -26,36 +28,75 @@
       <section class="hero card">
         <h1>BabyTools</h1>
         <p>
-          Kleine Alltagshelfer für Eltern. Ohne Tracking, schnell und direkt im Browser.
+          Schnelle Tools fuer Eltern - direkt nutzen, ohne Registrierung.
         </p>
+        <div class="hero-quicklinks" aria-label="Schnellzugriff Tools">
+          <a class="tool-cta" href="./tools/babywetter/">Babywetter starten</a>
+          <a class="tool-cta" href="./tools/windelrechner/">Windel-Rechner starten</a>
+        </div>
       </section>
 
-      <section aria-labelledby="tools-heading" class="stack-md">
-        <h2 id="tools-heading">Tools</h2>
-        <div class="tool-grid">
-          <a class="tool-card" href="./tools/babywetter/">
+      <section class="home-section stack-md" aria-labelledby="tools-heading">
+        <div class="home-section-head">
+          <h2 id="tools-heading">Tools</h2>
+        </div>
+        <div class="tool-grid tool-grid-primary">
+          <a class="tool-card tool-card-primary" href="./tools/babywetter/">
             <h3>BabyWetter</h3>
             <p>Outfit-Empfehlung für draussen anhand von Temperatur, Wind und Regen.</p>
             <span class="tool-cta">Tool öffnen</span>
           </a>
 
-          <a class="tool-card" href="./tools/windelrechner/">
+          <a class="tool-card tool-card-primary" href="./tools/windelrechner/">
             <h3>Windel-Rechner</h3>
             <p>Plane Windelbedarf, Packungen und Kosten für deinen Zeitraum.</p>
             <span class="tool-cta">Tool öffnen</span>
           </a>
+        </div>
+      </section>
 
-          <article class="tool-card is-disabled" aria-disabled="true">
-            <h3>Packliste</h3>
-            <p>Coming soon</p>
-            <span class="tool-cta">Demnächst</span>
-          </article>
+      <section class="home-section stack-md home-secondary" aria-labelledby="hub-heading">
+        <div class="home-section-head">
+          <h2 id="hub-heading">Weiterfuehrende Inhalte</h2>
+        </div>
+        <div class="hub-grid">
+          <section class="hub-block" aria-labelledby="hub-ratgeber-heading">
+            <h3 id="hub-ratgeber-heading">Top-Ratgeber</h3>
+            <ol>
+              <li><a href="./baby-richtig-anziehen-temperatur/">Baby richtig anziehen bei jeder Temperatur</a></li>
+              <li><a href="./windelbedarf-baby/">Windelbedarf im 1. Jahr: Tabelle und Rechner</a></li>
+              <li><a href="./baby-anziehen-nachts-temperatur/">Baby nachts richtig anziehen nach Temperatur</a></li>
+              <li><a href="./windeln-pro-monat-baby/">Wie viele Windeln pro Monat braucht ein Baby?</a></li>
+            </ol>
+          </section>
+        </div>
+      </section>
 
-          <article class="tool-card is-disabled" aria-disabled="true">
-            <h3>Budget</h3>
-            <p>Coming soon</p>
-            <span class="tool-cta">Demnächst</span>
-          </article>
+      <section class="home-section stack-md home-secondary" aria-labelledby="ratgeber-heading">
+        <div class="home-section-head">
+          <h2 id="ratgeber-heading">Ratgeber</h2>
+        </div>
+        <div class="tool-grid">
+          <a class="tool-card" href="./baby-richtig-anziehen-temperatur/">
+            <h3>Baby richtig anziehen</h3>
+            <p>Temperatur-Tabelle, Schichtenprinzip und Babywetter-Check.</p>
+            <span class="tool-cta">Ratgeber öffnen</span>
+          </a>
+          <a class="tool-card" href="./windelbedarf-baby/">
+            <h3>Windelbedarf im 1. Jahr</h3>
+            <p>Richtwerte nach Alter mit Tabelle und Windelrechner-Einbettung.</p>
+            <span class="tool-cta">Ratgeber öffnen</span>
+          </a>
+          <a class="tool-card" href="./baby-anziehen-nachts-temperatur/">
+            <h3>Baby nachts richtig anziehen</h3>
+            <p>Richtwerte fuer Schlafkleidung nach Raumtemperatur in der Nacht.</p>
+            <span class="tool-cta">Ratgeber öffnen</span>
+          </a>
+          <a class="tool-card" href="./windeln-pro-monat-baby/">
+            <h3>Wie viele Windeln pro Monat?</h3>
+            <p>Monatliche Richtwerte nach Alter plus Planung fuer Packungen.</p>
+            <span class="tool-cta">Ratgeber öffnen</span>
+          </a>
         </div>
       </section>
     </main>
