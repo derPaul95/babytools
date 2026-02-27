@@ -75,6 +75,11 @@ let weatherData = null;
 let dayWindowData = [];
 let dayOverview = null;
 
+function trackEvent(name, props) {
+  if (typeof window.babytoolsTrack !== "function") return;
+  window.babytoolsTrack(name, props || {});
+}
+
 function setStatus(message, isError) {
   el.status.textContent = message;
   el.status.style.color = isError ? "#b91c1c" : "";
@@ -131,9 +136,10 @@ function setHourlyReadyState(isReady) {
   updateRecommendState();
 }
 
-function setMode(modeValue) {
+function setMode(modeValue, source) {
   if (!el.mode) return;
   const allowed = modeValue === "day" ? "day" : "now";
+  const previous = el.mode.value;
   el.mode.value = allowed;
 
   el.choiceButtons.forEach((item) => {
@@ -144,6 +150,9 @@ function setMode(modeValue) {
   });
 
   updateRecommendState();
+  if (source === "user" && previous !== allowed) {
+    trackEvent("babywetter_mode_change", { mode: allowed });
+  }
 }
 
 function showResult(mode) {
@@ -1089,17 +1098,22 @@ async function loadWeatherForLocation(location, sourceText) {
     renderDayRange();
     setHourlyReadyState(false);
     if (getMode() === "day") {
-      setMode("now");
+      setMode("now", "fallback");
     }
     extraStatus = " Tagesverlauf nicht verfuegbar: " + error.message;
   }
 
   setStatus("Wetterdaten uebernommen (" + sourceText + ")." + extraStatus, Boolean(extraStatus));
+  trackEvent("babywetter_weather_loaded", {
+    mode: getMode(),
+    hourly_ready: hourlyDataReady ? 1 : 0,
+  });
 }
 
 async function handleGeoClick() {
   setStatus("Standort wird abgefragt...");
   el.geoBtn.disabled = true;
+  trackEvent("babywetter_use_geolocation", { action: "start" });
 
   try {
     const pos = await getCurrentPosition();
@@ -1136,11 +1150,13 @@ async function handleGeoClick() {
 
     renderLocationResults([currentLocation]);
     await loadWeatherForLocation(currentLocation, formatLocationName(currentLocation));
+    trackEvent("babywetter_use_geolocation", { action: "success" });
   } catch (error) {
     setStatus(
       "Standort/Wetter nicht verfuegbar: " + error.message + ". Nutze die Ortssuche oder versuche es erneut.",
       true
     );
+    trackEvent("babywetter_use_geolocation", { action: "error" });
   } finally {
     el.geoBtn.disabled = false;
   }
@@ -1156,15 +1172,18 @@ async function handleLocationSearch() {
 
   setStatus("Orte werden gesucht...");
   el.searchBtn.disabled = true;
+  trackEvent("babywetter_search_location", { action: "start" });
 
   try {
     const results = await fetchLocations(query);
     renderLocationResults(results);
     await loadWeatherForLocation(results[0], formatLocationName(results[0]));
+    trackEvent("babywetter_search_location", { action: "success" });
   } catch (error) {
     setStatus("Ortsuche fehlgeschlagen: " + error.message, true);
     el.resultsLabel.classList.add("hidden");
     locationResultsCache = [];
+    trackEvent("babywetter_search_location", { action: "error" });
   } finally {
     el.searchBtn.disabled = false;
   }
@@ -1181,8 +1200,10 @@ async function handleLocationPick(selectedIndex) {
   try {
     setActiveLocationResult(selectedIndex);
     await loadWeatherForLocation(item, formatLocationName(item));
+    trackEvent("babywetter_pick_location", { action: "success" });
   } catch (error) {
     setStatus("Wetterabruf fehlgeschlagen: " + error.message, true);
+    trackEvent("babywetter_pick_location", { action: "error" });
   }
 }
 
@@ -1205,7 +1226,7 @@ function handleChoicePick(event) {
   });
 
   if (target === "mode") {
-    setMode(value);
+    setMode(value, "user");
     if (el.empty.classList.contains("hidden")) {
       handleFormSubmit(event);
     }
@@ -1227,24 +1248,28 @@ function handleFormSubmit(event) {
     const values = readFormValues();
     if (getMode() === "day") {
       if (!hourlyDataReady) {
-        setMode("now");
+        setMode("now", "fallback");
         renderNowRecommendation(values);
         setStatus("Tagesverlauf nicht verfuegbar. Auf 'Jetzt' umgestellt.", true);
+        trackEvent("babywetter_recommendation", { mode: "day", result: "fallback_now" });
         return;
       }
       renderDayRecommendation(values);
       setStatus("Tagesempfehlung aktualisiert.");
+      trackEvent("babywetter_recommendation", { mode: "day", result: "ok" });
       return;
     }
 
     renderNowRecommendation(values);
     setStatus("Empfehlung aktualisiert.");
+    trackEvent("babywetter_recommendation", { mode: "now", result: "ok" });
   } catch (error) {
     setStatus(error.message, true);
+    trackEvent("babywetter_recommendation", { mode: getMode(), result: "error" });
   }
 }
 
-setMode("now");
+setMode("now", "init");
 setWeatherReadyState(false);
 setHourlyReadyState(false);
 renderDayRange();

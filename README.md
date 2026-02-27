@@ -39,9 +39,40 @@ Alle Links sind relativ gehalten, damit Deployments unter einem Unterpfad wie `/
 
 ## Datenschutz
 
-- Kein Tracking
-- Keine Cookies
-- Keine externen Analytics-Skripte
+- Keine Marketing-Cookies integriert
+- Optionales Event-Hook-System vorhanden (`window.babytoolsTrack`)
+
+### Analytics andocken (optional)
+
+Die App feuert interne Events ueber `window.babytoolsTrack(...)`.
+Wenn GA4 (`gtag`) eingebunden ist, werden diese Events automatisch weitergereicht.
+
+Typische Events:
+
+- `page_view`
+- `link_click`
+- `babywetter_recommendation`
+- `babywetter_mode_change`
+- `windelrechner_calculate`
+
+Beispiel GA4-Snippet (Measurement ID anpassen):
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7ZHVCRYMKP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-7ZHVCRYMKP');
+</script>
+```
+
+### Google Search Console (kostenlos)
+
+1. In der Search Console eine Domain-Property fuer `babytool.app` anlegen.
+2. DNS-Verification im Domain-Provider setzen.
+3. `https://babytool.app/sitemap.xml` einreichen.
+4. Unter `Leistung` Klicks, Impressionen, CTR und Queries beobachten.
 
 ## Legal pages added
 

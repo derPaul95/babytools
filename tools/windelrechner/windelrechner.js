@@ -33,6 +33,11 @@
     tip: document.getElementById('tip'),
   };
 
+  function trackEvent(name, props) {
+    if (typeof window.babytoolsTrack !== 'function') return;
+    window.babytoolsTrack(name, props || {});
+  }
+
   function toNumber(value) {
     const n = Number(value);
     return Number.isFinite(n) ? n : null;
@@ -183,11 +188,19 @@
 
     if (error) {
       setStatus(error, true);
+      trackEvent('windelrechner_error', { type: 'validation' });
       return;
     }
 
     const result = calculate(data);
     render(data, result);
+    trackEvent('windelrechner_calculate', {
+      age_class: data.ageClass,
+      period_days: data.periodDays,
+      has_custom_per_day: data.customPerDay !== null,
+      night_extra: data.nightExtra ? 1 : 0,
+      packs: result.packs,
+    });
   }
 
   function onChoiceClick(event) {
@@ -200,6 +213,7 @@
 
     if (target === 'ageClass') {
       setAgeClassValue(value);
+      trackEvent('windelrechner_ageclass_change', { age_class: value, source: 'buttons' });
       return;
     }
 
@@ -224,6 +238,7 @@
   if (el.ageClassSelect) {
     el.ageClassSelect.addEventListener('change', function (event) {
       setAgeClassValue(event.target.value);
+      trackEvent('windelrechner_ageclass_change', { age_class: event.target.value, source: 'select' });
     });
   }
   setAgeClassValue(el.ageClass.value);
