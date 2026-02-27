@@ -155,7 +155,8 @@
     settingsButton = document.createElement('button');
     settingsButton.type = 'button';
     settingsButton.className = 'consent-settings-btn';
-    settingsButton.textContent = 'Cookie-Einstellungen';
+    settingsButton.textContent = 'Cookies';
+    settingsButton.setAttribute('aria-label', 'Cookie-Einstellungen oeffnen');
     settingsButton.addEventListener('click', showBanner);
     document.body.appendChild(settingsButton);
   }
